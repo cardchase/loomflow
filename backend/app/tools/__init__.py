@@ -42,6 +42,8 @@ from app.tools.data_profiler import DataProfilerNode
 from app.tools.odds_portal_historical import OddsPortalScraperNode
 from app.tools.odds_portal_historical_v2 import OddsPortalScraperNodeV2
 from app.tools.odds_portal_upcoming import OddsPortalUpcomingNode
+from app.tools.odds_portal_upcoming_v2 import OddsPortalUpcomingNodeV2
+from app.tools.odds_portal_intermediate import OddsPortalIntermediateNode
 from app.tools.predictor import PredictorNode
 from app.tools.odds_analyzer import OddsAnalyzerNode
 from app.tools.football_engine import FootballEngineNode
@@ -89,6 +91,8 @@ NODE_CLASSES = {
     "odds_portal_scraper": OddsPortalScraperNode,
     "odds_portal_scraper_v2": OddsPortalScraperNodeV2,
     "odds_portal_upcoming": OddsPortalUpcomingNode,
+    "odds_portal_upcoming_v2": OddsPortalUpcomingNodeV2,
+    "odds_portal_intermediate": OddsPortalIntermediateNode,
     "predictor": PredictorNode,
     "odds_analyzer": OddsAnalyzerNode,
     "football_engine": FootballEngineNode

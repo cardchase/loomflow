@@ -78,7 +78,7 @@ HEADERS = [
     "DC_2H_1X", "DC_2H_12", "DC_2H_X2"    
 ]
 
-class OddsPortalUpcomingNode(BaseNode):
+class OddsPortalIntermediateNode(BaseNode):
     """
     ETL Node for harvesting odds data from OddsPortal.
     
@@ -87,15 +87,19 @@ class OddsPortalUpcomingNode(BaseNode):
     match status, scores, and various betting market lines.
     """
     MANIFEST = {
-        "id": "odds_portal_upcoming",
-        "name": "OddsPortal Upcoming Scraper",
+        "id": "odds_portal_intermediate",
+        "name": "OddsPortal Intermediate Scraper",
         "category": "source",
         "icon": "Target",
         "description": "High-fidelity odds harvesting from active React DOM states.",
         "ui_schema": [
-            {"field": "targetUrl", "type": "text", "label": "Target League URL", "default": "https://www.oddsportal.com/football/england/premier-league/"},
-            {"field": "maxWorkers", "type": "number", "label": "Max Concurrent Workers", "default": 10},
-            {"field": "headless", "type": "boolean", "label": "Run in Headless Mode", "default": True}
+            {"field": "leagueUrl", "type": "string", "label": "Target League URL (Optional)", "default": "", "description": "Enter a specific league URL (e.g., https://www.oddsportal.com/football/england/premier-league/). If left blank, it will scrape the global upcoming matches by default."},
+            {"field": "lookaheadDays", "type": "number", "label": "Lookahead Days", "default": 5, "hidden_if": "leagueUrl"},
+            {"field": "lookbackDays", "type": "number", "label": "Lookback Days", "default": 5, "hidden_if": "leagueUrl"},
+            {"field": "maxWorkers", "type": "number", "label": "Max Concurrent Workers", "default": 20},
+            {"field": "headless", "type": "boolean", "label": "Run in Headless Mode", "default": True},
+            {"field": "autoSaveCsvPath", "type": "file_picker_zone", "label": "Emergency Backup CSV (For long scrapes)", "default": "outputs/intermediates/intermediate_scraper.csv"},
+            {"field": "autoSaveBatchSize", "type": "number", "label": "Auto-Save Batch Size", "default": 1}
         ]
     }
 
@@ -105,26 +109,43 @@ class OddsPortalUpcomingNode(BaseNode):
         Validates inputs, initializes the asynchronous scraping pipeline, and wraps
         the result in a strongly-typed Polars DataFrame.
         """
-        target_url = self.parameters.get("targetUrl")
-        if not target_url:
-            raise ValueError("Target URL is required.")
+        league_url = str(self.parameters.get("leagueUrl", "")).strip()
+        lookahead_days = int(self.parameters.get("lookaheadDays", 5))
+        lookback_days = int(self.parameters.get("lookbackDays", 5))
         
-        # Sanitize accidental spaces from copy-paste
-        target_url = target_url.strip().replace(" ", "-")
+        import datetime
+        today = datetime.datetime.now()
+        
+        target_urls = []
+        
+        if league_url:
+            target_urls.append(league_url)
+        else:
+            # Past days
+            for i in range(lookback_days, 0, -1):
+                target_date = today - datetime.timedelta(days=i)
+                target_urls.append(f"https://www.oddsportal.com/matches/football/{target_date.strftime('%Y%m%d')}/")
+                
+            # Day 0 is /football/ (according to user request)
+            target_urls.append("https://www.oddsportal.com/football/")
             
-        result_rows = asyncio.run(self.run_crawler_pipeline(target_url))
+            # Future days are /matches/football/YYYYMMDD/
+            for i in range(1, lookahead_days + 1):
+                target_date = today + datetime.timedelta(days=i)
+                target_urls.append(f"https://www.oddsportal.com/matches/football/{target_date.strftime('%Y%m%d')}/")
+            
+        result_rows = asyncio.run(self.run_crawler_pipeline(target_urls))
         schema = {h: pl.Utf8 if h in ["Date", "Time", "Country", "Competition", "Season", "HomeTeam", "AwayTeam", "Match_Status", "URL", "Match_Winner_Final", "Is_Knockout", "Went_To_ET"] else pl.Float64 for h in HEADERS}
         return pl.DataFrame(result_rows, schema=schema) if result_rows else pl.DataFrame([], schema=schema)
 
-    async def run_crawler_pipeline(self, url: str) -> List[Dict[str, Any]]:
+    async def run_crawler_pipeline(self, urls: List[str]) -> List[Dict[str, Any]]:
         """
         Orchestrates the entire scraping lifecycle.
         
         - Instantiates Playwright and Chromium.
         - Applies stealth plugin to evade bot detection.
-        - If the URL is a specific match, scrapes it directly.
-        - If the URL is a competition/league, it paginates through the list of matches
-          and uses an asyncio Semaphore to extract data concurrently (e.g. 10 tabs at once).
+        - Paginates through the list of matches
+          and uses an asyncio Semaphore to extract data concurrently.
         """
         # Instantly clear any old cached results in the UI
         sid = getattr(self, "session_id", "default")
@@ -133,8 +154,6 @@ class OddsPortalUpcomingNode(BaseNode):
         from app.cache import cache_manager
         cache_manager.get_cache(sid).set_node_partial_result(self.node_id, empty_df, self.logs)
 
-        is_match = "/h2h/" in url or re.search(r'-[a-zA-Z0-9]{8}/(?:#.*)?$', url)
-        
         async with async_playwright() as p:
             headless_mode = str(self.parameters.get("headless", "true")).lower() == "true"
             
@@ -177,219 +196,176 @@ class OddsPortalUpcomingNode(BaseNode):
             self.global_pause_event.set()
             
             try:
-                if is_match:
-                    page = await context.new_page()
-                    await Stealth().apply_stealth_async(page)
-                    row = await self.execute_interception_engine(page, url)
-                    return [row] if row else []
-                else:
-                    scrape_all_seasons = self.parameters.get("scrapeAllSeasons", False)
-                    auto_save_csv = self.parameters.get("autoSaveCsvPath", None)
-                    auto_save_batch_size = int(self.parameters.get("autoSaveBatchSize", 10))
-                    schema = {h: pl.Utf8 if h in ["Date", "Time", "Country", "Competition", "Season", "HomeTeam", "AwayTeam", "Match_Status", "URL", "Match_Winner_Final", "Is_Knockout", "Went_To_ET"] else pl.Float64 for h in HEADERS}
-                    
-                    competition_page = await context.new_page()
-                    await Stealth().apply_stealth_async(competition_page)
-                    
-                    if scrape_all_seasons:
-                        # Intelligence check: If the user provided a specific season year in the URL, don't crawl upwards.
-                        if re.search(r'-\d{4}-\d{4}/results/?$', url) or re.search(r'-\d{4}/results/?$', url):
-                            self.log("Detected a specific season in the target URL. Bypassing 'scrapeAllSeasons' to stay at the lowest level.")
-                            season_urls = [url]
-                        else:
-                            season_urls = await self.extract_season_links(competition_page, url)
-                            # Intelligence Upgrade: Sort chronologically to always explore latest data first.
-                            season_urls.sort(reverse=True)
-                    else:
-                        season_urls = [url]
+                auto_save_csv = self.parameters.get("autoSaveCsvPath", "outputs/intermediates/upcoming_intermediate.csv")
+                auto_save_batch_size = int(self.parameters.get("autoSaveBatchSize", 1))
+                schema = {h: pl.Utf8 if h in ["Date", "Time", "Country", "Competition", "Season", "HomeTeam", "AwayTeam", "Match_Status", "URL", "Match_Winner_Final", "Is_Knockout", "Went_To_ET"] else pl.Float64 for h in HEADERS}
+                
+                competition_page = await context.new_page()
+                await Stealth().apply_stealth_async(competition_page)
+                
+                season_urls = urls
                         
-                    all_valid_rows = []
-                    csv_buffer = []
-                    scraped_urls = set()
+                all_valid_rows = []
+                csv_buffer = []
+                scraped_urls = set()
+                
+
+                
+                consecutive_fully_scraped_pages = 0
+                
+                for s_idx, season_url in enumerate(season_urls):
+                    if hasattr(self, "is_cancelled") and self.is_cancelled():
+                        break
+                    if consecutive_fully_scraped_pages >= 2:
+                        self.log("✨ INTELLIGENCE ENGINE: Reached purely historical data (2 fully populated pages). Halting backward scan to save time.")
+                        break
+                        
+                    season_slug = season_url.split('football/')[-1] if 'football/' in season_url else season_url
+                    self.log(f"📅 [Season {s_idx+1}/{len(season_urls)}] Backward Scan: {season_slug}")
+                    match_links, consecutive_fully_scraped_pages = await self.extract_match_links(competition_page, season_url, scraped_urls, consecutive_fully_scraped_pages)
                     
-                    if auto_save_csv:
-                        if os.path.exists(auto_save_csv):
-                            try:
-                                existing_df = pl.read_csv(auto_save_csv)
-                                if "URL" in existing_df.columns:
-                                    if "HomeTeam" in existing_df.columns:
-                                        valid_df = existing_df.filter(
-                                            pl.col("HomeTeam").is_not_null() & 
-                                            (pl.col("HomeTeam") != "None") & 
-                                            (pl.col("HomeTeam") != "Unknown") &
-                                            (pl.col("HomeTeam") != "")
-                                        )
-                                        # Auto-Correction Mode: Any rows missing critical odds are dropped from 'valid_df'
-                                        # This forces them to be re-scraped when the spider finds their link.
-                                        critical_cols = ["FT_HomeOdds", "DNB_Home", "DC_FT_1X", "BTTS_Yes", "OU25_Over"]
-                                        for c in critical_cols:
-                                            if c in valid_df.columns:
-                                                valid_df = valid_df.filter(pl.col(c).is_not_null())
-                                    else:
-                                        valid_df = existing_df
-                                        
-                                    scraped_urls = set(valid_df["URL"].to_list())
-                                    all_valid_rows = valid_df.to_dicts()
-                                    discarded = len(existing_df) - len(valid_df)
-                                    self.log(f"Resuming from {auto_save_csv}: Loaded {len(all_valid_rows)} valid matches. Discarded {discarded} incomplete records to be retried.")
-                            except Exception as e:
-                                self.log(f"Warning: Could not read existing CSV for resume: {e}")
+                    original_len = len(match_links)
+                    match_links = [m for m in match_links if m not in scraped_urls]
+                    if len(match_links) < original_len:
+                        self.log(f"Skipping {original_len - len(match_links)} matches already scraped in this season.")
                     
-                    consecutive_fully_scraped_pages = 0
+                    max_workers = int(self.parameters.get("maxWorkers", 1))
+                    print(f"Found {len(match_links)} new matches to scrape. Starting concurrent extraction ({max_workers} at a time)...")
                     
-                    for s_idx, season_url in enumerate(season_urls):
+                    semaphore = asyncio.Semaphore(max_workers)
+                    
+                    async def process_match(match_url, original_idx, is_retry=False):
                         if hasattr(self, "is_cancelled") and self.is_cancelled():
-                            break
-                        if consecutive_fully_scraped_pages >= 2:
-                            self.log("✨ INTELLIGENCE ENGINE: Reached purely historical data (2 fully populated pages). Halting backward scan to save time.")
-                            break
+                            return None
                             
-                        season_slug = season_url.split('football/')[-1] if 'football/' in season_url else season_url
-                        self.log(f"📅 [Season {s_idx+1}/{len(season_urls)}] Backward Scan: {season_slug}")
-                        match_links, consecutive_fully_scraped_pages = await self.extract_match_links(competition_page, season_url, scraped_urls, consecutive_fully_scraped_pages)
+                        await self.wait_for_clearance()
+                        # Stagger start BEFORE grabbing semaphore to prevent locking pool slots while sleeping
+                        await asyncio.sleep(random.uniform(0.5, 3.0))
                         
-                        original_len = len(match_links)
-                        match_links = [m for m in match_links if m not in scraped_urls]
-                        if len(match_links) < original_len:
-                            self.log(f"Skipping {original_len - len(match_links)} matches already scraped in this season.")
-                        
-                        max_workers = int(self.parameters.get("maxWorkers", 1))
-                        print(f"Found {len(match_links)} new matches to scrape. Starting concurrent extraction ({max_workers} at a time)...")
-                        
-                        semaphore = asyncio.Semaphore(max_workers)
-                        
-                        async def process_match(match_url, original_idx, is_retry=False):
+                        async with semaphore:
                             if hasattr(self, "is_cancelled") and self.is_cancelled():
                                 return None
+                            page = None
+                            try:
+                                page = await context.new_page()
+                                await Stealth().apply_stealth_async(page)
+                                if is_retry:
+                                    # Wait slightly longer on retries
+                                    await asyncio.sleep(2.0)
                                 
-                            await self.wait_for_clearance()
-                            # Stagger start BEFORE grabbing semaphore to prevent locking pool slots while sleeping
-                            await asyncio.sleep(random.uniform(0.5, 3.0))
-                            
-                            async with semaphore:
+                                match_slug = match_url.split('/')[-2] if '/' in match_url else match_url
+                                tab_id = (original_idx % max_workers) + 1
+                                self.log(f"⚡ [Tab {tab_id}] Extracting Data: {match_slug}")
+                                res = await self.execute_interception_engine(page, match_url)
+                                if res:
+                                    res["_original_order"] = original_idx
+                                    res["_season_order"] = s_idx
+                                return res
+                            except Exception as e:
                                 if hasattr(self, "is_cancelled") and self.is_cancelled():
                                     return None
-                                page = None
-                                try:
-                                    page = await context.new_page()
-                                    await Stealth().apply_stealth_async(page)
-                                    if is_retry:
-                                        # Wait slightly longer on retries
-                                        await asyncio.sleep(2.0)
-                                    
-                                    match_slug = match_url.split('/')[-2] if '/' in match_url else match_url
-                                    tab_id = (original_idx % max_workers) + 1
-                                    self.log(f"⚡ [Tab {tab_id}] Extracting Data: {match_slug}")
-                                    res = await self.execute_interception_engine(page, match_url)
-                                    if res:
-                                        res["_original_order"] = original_idx
-                                        res["_season_order"] = s_idx
-                                    return res
-                                except Exception as e:
-                                    if hasattr(self, "is_cancelled") and self.is_cancelled():
-                                        return None
-                                    if "closed" in str(e).lower():
-                                        self.log("Browser connection closed unexpectedly, pausing tasks to prevent spam...")
-                                        await asyncio.sleep(5.0)
-                                    return {"_failed": True, "_error": str(e), "URL": match_url, "_original_order": original_idx, "_season_order": s_idx}
-                                finally:
-                                    if page:
-                                        try:
-                                            await asyncio.sleep(0.5 if not is_retry else 1.5) # Allow visual transition
-                                            await page.close()
-                                            await asyncio.sleep(0.5) # Wait before next page
-                                        except:
-                                            pass
+                                if "closed" in str(e).lower():
+                                    self.log("Browser connection closed unexpectedly, pausing tasks to prevent spam...")
+                                    await asyncio.sleep(5.0)
+                                return {"_failed": True, "_error": str(e), "URL": match_url, "_original_order": original_idx, "_season_order": s_idx}
+                            finally:
+                                if page:
+                                    try:
+                                        await asyncio.sleep(0.5 if not is_retry else 1.5) # Allow visual transition
+                                        await page.close()
+                                        await asyncio.sleep(0.5) # Wait before next page
+                                    except:
+                                        pass
+                                        
+                    tasks = [asyncio.create_task(process_match(link, i)) for i, link in enumerate(match_links)]
+                    retry_queue = []
+                    
+                    async def consume_tasks(current_tasks, is_retry=False):
+                        for completed_task in asyncio.as_completed(current_tasks):
+                            if hasattr(self, "is_cancelled") and self.is_cancelled():
+                                self.log("Cancellation detected, aborting extraction loop.")
+                                for t in current_tasks:
+                                    t.cancel()
+                                break
+                            try:
+                                r = await completed_task
+                                if isinstance(r, dict):
+                                    needs_retry = False
+                                    if not is_retry:
+                                        critical_cols = ["FT_HomeOdds", "DNB_Home", "DC_FT_1X", "BTTS_Yes", "OU25_Over"]
+                                        missing_cols = [col for col in critical_cols if r.get(col) is None]
+                                        found_cols = [col for col in critical_cols if r.get(col) is not None]
+                                        if len(missing_cols) > 0 and not r.get("_skip_retry"):
+                                            needs_retry = True
                                             
-                        tasks = [asyncio.create_task(process_match(link, i)) for i, link in enumerate(match_links)]
-                        retry_queue = []
-                        
-                        async def consume_tasks(current_tasks, is_retry=False):
-                            for completed_task in asyncio.as_completed(current_tasks):
-                                if hasattr(self, "is_cancelled") and self.is_cancelled():
-                                    self.log("Cancellation detected, aborting extraction loop.")
-                                    for t in current_tasks:
-                                        t.cancel()
-                                    break
-                                try:
-                                    r = await completed_task
-                                    if isinstance(r, dict):
-                                        needs_retry = False
-                                        if not is_retry:
-                                            critical_cols = ["FT_HomeOdds", "DNB_Home", "DC_FT_1X", "BTTS_Yes", "OU25_Over"]
-                                            missing_cols = [col for col in critical_cols if r.get(col) is None]
-                                            found_cols = [col for col in critical_cols if r.get(col) is not None]
-                                            if len(missing_cols) > 0 and not r.get("_skip_retry"):
-                                                needs_retry = True
-                                                
-                                        if needs_retry:
-                                            match_title = f"{r.get('HomeTeam', 'Unknown')} vs {r.get('AwayTeam', 'Unknown')}"
-                                            self.log(f"⚠️ [Incomplete] {match_title} missing {len(missing_cols)} critical odds. Added to auto-correction queue.")
-                                            self.log(f"   ↳ Found: {', '.join(found_cols) if found_cols else 'None'}")
-                                            self.log(f"   ↳ Missing: {', '.join(missing_cols)}")
-                                            retry_queue.append({'url': r.get("URL"), 'idx': r.get("_original_order")})
-                                        elif r.get("_failed"):
-                                            pass
-                                        elif r.get("_skip_retry") and not r.get("_no_odds"):
-                                            # Discard garbage/honeypot row
-                                            pass
-                                        else:
-                                            all_valid_rows.append(r)
-                                            # Sort chronologically (latest to oldest matches) via season index then original index
-                                            all_valid_rows.sort(key=lambda x: (x.get("_season_order", 0), x.get("_original_order", 999999)))
-                                            
-                                            # Send sequential update to cache manager so UI data tab updates in real-time
-                                            # Exclude temporary fields from final output schema
-                                            clean_rows = [{k: v for k, v in row.items() if k not in ["_original_order", "_season_order", "_skip_retry", "_no_odds"]} for row in all_valid_rows]
-                                            partial_df = pl.DataFrame(clean_rows, schema=schema) if clean_rows else pl.DataFrame()
-                                            sid = getattr(self, "session_id", "default")
-                                            
-                                            status_str = r.get("Match_Status", "N/A")
-                                            ft_score = f"{r.get('FT_HomeScore')}-{r.get('FT_AwayScore')}" if r.get('FT_HomeScore') is not None else "N/A"
-                                            match_title = f"{r.get('HomeTeam', 'Unknown')} vs {r.get('AwayTeam', 'Unknown')}"
-                                            retry_tag = "🛠️ [CORRECTED]" if is_retry else "✅"
-                                            tab_id = (r.get('_original_order', 0) % max_workers) + 1
-                                            self.log(f"{retry_tag} [Tab {tab_id}] [Saved] {match_title} | Status: {status_str} | Score: {ft_score}")
-                                            
-                                            cache_manager.get_cache(sid).set_node_partial_result(
-                                                self.node_id, partial_df, self.logs
-                                            )
-                                            
-                                            # Auto-save CSV logic: overwrite completely each time to ensure perfect sort order
-                                            if auto_save_csv:
-                                                try:
-                                                    import os
-                                                    tmp_csv = auto_save_csv + ".tmp"
-                                                    partial_df.write_csv(tmp_csv)
-                                                    os.replace(tmp_csv, auto_save_csv)
-                                                    self.log(f"Auto-saved up to {len(clean_rows)} rows to CSV (Sorted).")
-                                                except Exception as e:
-                                                    self.log(f"Error auto-saving to CSV: {e}")
-                                except Exception as e:
-                                    if not (hasattr(self, "is_cancelled") and self.is_cancelled()):
-                                        self.log(f"Error extracting match: {e}")
+                                    if needs_retry:
+                                        match_title = f"{r.get('HomeTeam', 'Unknown')} vs {r.get('AwayTeam', 'Unknown')}"
+                                        self.log(f"⚠️ [Incomplete] {match_title} missing {len(missing_cols)} critical odds. Added to auto-correction queue.")
+                                        self.log(f"   ↳ Found: {', '.join(found_cols) if found_cols else 'None'}")
+                                        self.log(f"   ↳ Missing: {', '.join(missing_cols)}")
+                                        retry_queue.append({'url': r.get("URL"), 'idx': r.get("_original_order")})
+                                    elif r.get("_failed"):
+                                        pass
+                                    elif r.get("_skip_retry") and not r.get("_no_odds"):
+                                        # Discard garbage/honeypot row
+                                        pass
+                                    else:
+                                        all_valid_rows.append(r)
+                                        # Sort chronologically (latest to oldest matches) via season index then original index
+                                        all_valid_rows.sort(key=lambda x: (x.get("_season_order", 0), x.get("_original_order", 999999)))
+                                        
+                                        # Send sequential update to cache manager so UI data tab updates in real-time
+                                        # Exclude temporary fields from final output schema
+                                        clean_rows = [{k: v for k, v in row.items() if k not in ["_original_order", "_season_order", "_skip_retry", "_no_odds"]} for row in all_valid_rows]
+                                        partial_df = pl.DataFrame(clean_rows, schema=schema) if clean_rows else pl.DataFrame()
+                                        sid = getattr(self, "session_id", "default")
+                                        
+                                        status_str = r.get("Match_Status", "N/A")
+                                        ft_score = f"{r.get('FT_HomeScore')}-{r.get('FT_AwayScore')}" if r.get('FT_HomeScore') is not None else "N/A"
+                                        match_title = f"{r.get('HomeTeam', 'Unknown')} vs {r.get('AwayTeam', 'Unknown')}"
+                                        retry_tag = "🛠️ [CORRECTED]" if is_retry else "✅"
+                                        tab_id = (r.get('_original_order', 0) % max_workers) + 1
+                                        self.log(f"{retry_tag} [Tab {tab_id}] [Saved] {match_title} | Status: {status_str} | Score: {ft_score}")
+                                        
+                                        cache_manager.get_cache(sid).set_node_partial_result(
+                                            self.node_id, partial_df, self.logs
+                                        )
+                                        
+                                        # Auto-save CSV logic: overwrite completely each time to ensure perfect sort order
+                                        if auto_save_csv:
+                                            try:
+                                                import os
+                                                tmp_csv = auto_save_csv + ".tmp"
+                                                partial_df.write_csv(tmp_csv)
+                                                os.replace(tmp_csv, auto_save_csv)
+                                                self.log(f"Auto-saved up to {len(clean_rows)} rows to CSV (Sorted).")
+                                            except Exception as e:
+                                                self.log(f"Error auto-saving to CSV: {e}")
+                            except Exception as e:
+                                if not (hasattr(self, "is_cancelled") and self.is_cancelled()):
+                                    self.log(f"Error extracting match: {e}")
 
-                        # Pass 1: Initial Scrape
-                        await consume_tasks(tasks, is_retry=False)
+                    # Pass 1: Initial Scrape
+                    await consume_tasks(tasks, is_retry=False)
+                    
+                    # Pass 2: Recursive Deep Scrape for missing data
+                    if retry_queue and not (hasattr(self, "is_cancelled") and self.is_cancelled()):
+                        self.log(f"Starting Recursive Retry Pass for {len(retry_queue)} matches with missing critical data...")
+                        retry_tasks = [asyncio.create_task(process_match(item['url'], item['idx'], is_retry=True)) for item in retry_queue]
+                        await consume_tasks(retry_tasks, is_retry=True)
                         
-                        # Pass 2: Recursive Deep Scrape for missing data
-                        if retry_queue and not (hasattr(self, "is_cancelled") and self.is_cancelled()):
-                            self.log(f"Starting Recursive Retry Pass for {len(retry_queue)} matches with missing critical data...")
-                            retry_tasks = [asyncio.create_task(process_match(item['url'], item['idx'], is_retry=True)) for item in retry_queue]
-                            await consume_tasks(retry_tasks, is_retry=True)
-                            
-                    await competition_page.close()
-                    
-                    self.log("=" * 60)
-                    self.log(f"SCRAPING COMPLETE | Processed {len(season_urls)} Seasons")
-                    self.log(f"New Matches Successfully Extracted: {len(all_valid_rows) - len(scraped_urls)}")
-                    self.log(f"Historical Matches Preserved: {len(scraped_urls)}")
-                    self.log(f"Total Matches In Final Dataset: {len(all_valid_rows)}")
-                    self.log("=" * 60)
-                    
-                    # Clean out sorting metadata before returning
-                    clean_rows = [{k: v for k, v in row.items() if k not in ["_original_order", "_season_order"]} for row in all_valid_rows]
-                    return clean_rows
+                await competition_page.close()
+                
+                self.log("=" * 60)
+                self.log(f"SCRAPING COMPLETE | Processed {len(season_urls)} Seasons")
+                self.log(f"New Matches Successfully Extracted: {len(all_valid_rows) - len(scraped_urls)}")
+                self.log(f"Historical Matches Preserved: {len(scraped_urls)}")
+                self.log(f"Total Matches In Final Dataset: {len(all_valid_rows)}")
+                self.log("=" * 60)
+                
+                # Clean out sorting metadata before returning
+                clean_rows = [{k: v for k, v in row.items() if k not in ["_original_order", "_season_order"]} for row in all_valid_rows]
+                return clean_rows
             except Exception as e:
                 if hasattr(self, "is_cancelled") and self.is_cancelled():
                     self.log("Pipeline execution aborted gracefully due to cancellation signal.")
@@ -500,10 +476,25 @@ class OddsPortalUpcomingNode(BaseNode):
                     break
                 self.log(f"Scanning page {page_num} for matches...")
                 
-                # Scroll to load lazy-loaded matches
-                for _ in range(5):
-                    await page.evaluate("window.scrollBy(0, window.innerHeight)")
-                    await page.wait_for_timeout(3000)
+                # Smooth, progressive scroll to force React virtual DOM hydration of match links
+                await page.evaluate("""
+                    async () => {
+                        await new Promise((resolve) => {
+                            let totalHeight = 0;
+                            let distance = 350;
+                            let timer = setInterval(() => {
+                                window.scrollBy(0, distance);
+                                totalHeight += distance;
+                                // Stop if reached bottom or scrolled sufficiently far
+                                if (totalHeight >= document.body.scrollHeight || totalHeight > 15000) {
+                                    clearInterval(timer);
+                                    resolve();
+                                }
+                            }, 1000); // 1000ms pause between tiny scrolls
+                        });
+                    }
+                """)
+                await page.wait_for_timeout(2000)
                 
                 # Scope to all links, filtering is done reliably in python
                 links = await page.evaluate("""() => {
@@ -747,17 +738,59 @@ class OddsPortalUpcomingNode(BaseNode):
                 return str.replace(/[\u00a0\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
             };
 
-            // 1. Extract Date & Time directly from data-testid="game-time-item"
-            let timeItem = document.querySelector('[data-testid="game-time-item"]');
-            if (timeItem) {
-                let pTags = Array.from(timeItem.querySelectorAll('p')).map(p => cleanText(p.innerText));
+            // 1. Extract Date & Time: Multi-Tiered Fallback Engine
+            let foundDate = false;
+            let foundTime = false;
+
+            // Attempt A: Targeted Component Extraction with Expanded Selectors for H2H Pages
+            let timeItems = Array.from(document.querySelectorAll('[data-testid="game-time-item"], .text-xs, .text-gray-dark, div.flex-col > p, div.flex-col > span'));
+            
+            for (let item of timeItems) {
+                let pTags = Array.from(item.querySelectorAll('p, span, div')).map(p => cleanText(p.innerText));
+                pTags.push(cleanText(item.innerText)); 
+                
                 for (let p of pTags) {
-                    let dateMatch = p.match(/\b(\d{1,2}\s+[A-Za-z]{3}\s+\d{4})\b/);
-                    if (dateMatch) res.Date = dateMatch[1];
+                    let dateMatch = p.match(/\b(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:,?\s+\d{4})?)\b/i);
+                    if (dateMatch && !foundDate) {
+                        res.Date = dateMatch[1].replace(',', '');
+                        foundDate = true;
+                    }
                     let timeMatch = p.match(/\b(\d{2}:\d{2})\b/);
-                    if (timeMatch) res.Time = timeMatch[1];
+                    if (timeMatch && !foundTime) {
+                        res.Time = timeMatch[1];
+                        foundTime = true;
+                    }
+                }
+                if (foundDate && foundTime) break;
+            }
+
+            // Attempt B: Proximity scan anchoring on Match Titles or Scoreboards
+            if (!foundDate || !foundTime) {
+                let anchors = document.querySelectorAll('h1, h2, [data-testid="live-info"], .live-info');
+                for (let anchor of anchors) {
+                    let parent = anchor.parentElement ? anchor.parentElement.parentElement : null;
+                    let text = cleanText(parent ? parent.innerText : '');
+                    
+                    if (!foundDate) {
+                        let dateMatch = text.match(/\b(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:,?\s+\d{4})?)\b/i);
+                        if (dateMatch) {
+                            res.Date = dateMatch[1].replace(',', '');
+                            foundDate = true;
+                        }
+                    }
+                    if (!foundTime) {
+                        let timeMatch = text.match(/\b(\d{2}:\d{2})\b/);
+                        if (timeMatch) {
+                            res.Time = timeMatch[1];
+                            foundTime = true;
+                        }
+                    }
+                    if (foundDate && foundTime) break;
                 }
             }
+            
+            // REMOVED ATTEMPT C (JSON-LD Fallback): OddsPortal's backend frequently injects 
+            // the date of the NEXT scheduled fixture (e.g., April 2027) into historical H2H pages.
 
             // 2. Extract Teams from H1
             let h1 = document.querySelector('h1');
@@ -855,11 +888,9 @@ class OddsPortalUpcomingNode(BaseNode):
 
             // 2. Extract Country and Competition directly from URL pathname & JSON-LD Breadcrumbs
             let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
-            // Path structure: ['football', 'england', 'premier-league', 'match-slug-id']
-            if (pathParts.length >= 3 && pathParts[0].toLowerCase() === 'football') {
+            // Ignore /h2h/ URLs for path extraction as they lack country/competition structure
+            if (pathParts.length >= 3 && pathParts[0].toLowerCase() === 'football' && pathParts[1].toLowerCase() !== 'h2h') {
                 res.Country = pathParts[1].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                
-                // Clean league name (removes historical season years like -2024-2025 if attached)
                 let compRaw = pathParts[2].replace(/-\d{4}(-\d{4})?$/, '');
                 res.Competition = compRaw.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             }
@@ -870,8 +901,15 @@ class OddsPortalUpcomingNode(BaseNode):
                     let d = JSON.parse(script.textContent);
                     if (d["@type"] === "BreadcrumbList" && Array.isArray(d.itemListElement)) {
                         let items = d.itemListElement;
-                        if (items[1]?.name) res.Country = cleanText(items[1].name);
-                        if (items[2]?.name) res.Competition = cleanText(items[2].name);
+                        // Structure is usually Home [0] > Football [1] > Country [2] > Competition [3]
+                        let footIndex = items.findIndex(i => i.name && i.name.toLowerCase() === 'football');
+                        if (footIndex !== -1 && items.length > footIndex + 2) {
+                            res.Country = cleanText(items[footIndex + 1].name);
+                            res.Competition = cleanText(items[footIndex + 2].name);
+                        } else if (items.length >= 4) {
+                            res.Country = cleanText(items[2].name);
+                            res.Competition = cleanText(items[3].name);
+                        }
                     }
                 } catch(e) {}
             });
@@ -948,7 +986,7 @@ class OddsPortalUpcomingNode(BaseNode):
         for source_url in [url, self.parameters.get("targetUrl", "")]:
             if not source_url:
                 continue
-            path_match = re.search(r'oddsportal\.com/football/([^/]+)/([^/]+)/?', source_url)
+            path_match = re.search(r'oddsportal\.com/football/(?!h2h/)([^/]+)/([^/]+)/?', source_url)
             if path_match:
                 if not extracted_row.get("Country"):
                     extracted_row["Country"] = path_match.group(1).replace('-', ' ').title()

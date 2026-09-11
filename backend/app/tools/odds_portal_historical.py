@@ -87,7 +87,7 @@ class OddsPortalScraperNode(BaseNode):
     match status, scores, and various betting market lines.
     """
     MANIFEST = {
-        "id": "odds_portal_scraper_v2",
+        "id": "odds_portal_scraper",
         "name": "OddsPortal Historical Scraper",
         "category": "source",
         "icon": "Target",
@@ -95,7 +95,7 @@ class OddsPortalScraperNode(BaseNode):
         "ui_schema": [
             {"field": "targetUrl", "type": "text", "label": "Target URL", "default": "https://www.oddsportal.com/football/england/premier-league/results/"},
             {"field": "maxWorkers", "type": "number", "label": "Max Concurrent Workers", "default": 2},
-            {"field": "headless", "type": "toggle", "label": "Run in Headless Mode", "default": True}
+            {"field": "headless", "type": "boolean", "label": "Run in Headless Mode", "default": True}
         ]
     }
 

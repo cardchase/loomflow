@@ -162,26 +162,33 @@ input[type="checkbox"] {
 .tab-spinner { animation: spin 1s linear infinite; display: inline-flex; align-items: center; justify-content: center; color: #4361ee; margin-left: 6px; }
 /* AG Grid custom styling for compact Data Preview */
 .ag-theme-quartz {
-  --ag-font-family: var(--font-secondary);
-  --ag-font-size: 11.5px;
-  --ag-row-height: 26px;
-  --ag-header-height: 30px;
+  --ag-font-family: var(--font-data-preview, var(--font-secondary));
+  --ag-font-size: var(--font-size-data-preview, 11.5px);
+  --ag-row-height: calc(var(--font-size-data-preview, 11.5px) + 14px);
+  --ag-header-height: calc(var(--font-size-data-preview, 11.5px) + 18px);
   --ag-header-background-color: var(--bg-tertiary);
   --ag-odd-row-background-color: #fafafa;
   --ag-borders: solid 1px var(--border-color);
   --ag-border-color: var(--border-color);
+  
+  font-family: var(--font-data-preview, var(--font-secondary)) !important;
 }
 
 .ag-theme-quartz .ag-header-cell-label {
   font-weight: 600;
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: calc(max(11px, var(--font-size-data-preview, 11.5px) * 0.9));
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  font-family: var(--font-data-preview, var(--font-secondary)) !important;
 }
 
 .ag-theme-quartz .ag-cell {
-  line-height: 24px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-data-preview, var(--font-secondary)) !important;
+  font-size: var(--font-size-data-preview, 11.5px) !important;
 }
 
 /* Custom Flashy Animated Wires (zoom zoom) */

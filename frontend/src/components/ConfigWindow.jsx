@@ -1434,6 +1434,9 @@ const ConfigWindow = ({ selectedNode, upstreamSchema, onUpdateParams, availableT
           borderTop: '1px solid var(--border-color)'
         }}>
           {toolDef && toolDef.ui_schema && toolDef.ui_schema.filter(f => f.field !== 'imagePath').map((fieldDef) => {
+            if (fieldDef.hidden_if && parameters[fieldDef.hidden_if]) {
+              return null;
+            }
             if (fieldDef.type === 'select') {
               return (
                 <div className="form-group" key={fieldDef.field} style={{ marginBottom: 0 }}>
@@ -2963,6 +2966,10 @@ const ConfigWindow = ({ selectedNode, upstreamSchema, onUpdateParams, availableT
 
   const renderDynamicForm = (uiSchema) => {
     return uiSchema.map((fieldDef, idx) => {
+      if (fieldDef.hidden_if && parameters[fieldDef.hidden_if]) {
+        return null;
+      }
+      
       const val = parameters[fieldDef.field] !== undefined ? parameters[fieldDef.field] : fieldDef.default;
 
       if (fieldDef.type === 'boolean') {
@@ -3317,6 +3324,47 @@ const ConfigWindow = ({ selectedNode, upstreamSchema, onUpdateParams, availableT
         return (
           <div key={idx} className="form-group" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'var(--bg-primary)', padding: '10px', borderRadius: '4px', borderLeft: '3px solid var(--color-accent)', lineHeight: '1.4' }}>
             <div dangerouslySetInnerHTML={{ __html: fieldDef.content }} />
+          </div>
+        );
+      }
+
+      if (fieldDef.type === 'file_picker_zone') {
+        return (
+          <div key={idx} className="form-group" style={{ marginTop: '16px' }}>
+            <label className="form-label">{fieldDef.label}</label>
+            <div
+              className="file-upload-zone"
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${API_BASE}/api/pick_save_file`);
+                  const data = await res.json();
+                  if (data.file_path) {
+                    handleParamChange(fieldDef.field, data.file_path);
+                  }
+                } catch (e) {
+                  console.error("Failed to pick file", e);
+                }
+              }}
+            >
+              <Upload />
+              <div className="file-upload-text">
+                {val ? (
+                  <div style={{ color: 'var(--color-success)', fontWeight: 600 }}>
+                    <Check size={14} style={{ display: 'inline', marginRight: 4 }} />
+                    {val.split(/[/\\]/).pop()}
+                  </div>
+                ) : (
+                  <>Click to select CSV destination (Optional)</>
+                )}
+              </div>
+            </div>
+            {val && (
+              <div style={{ marginTop: '8px' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', wordBreak: 'break-all' }}>
+                  {val}
+                </div>
+              </div>
+            )}
           </div>
         );
       }

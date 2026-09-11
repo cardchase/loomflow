@@ -88,14 +88,14 @@ class OddsPortalScraperNodeV2(BaseNode):
     """
     MANIFEST = {
         "id": "odds_portal_scraper_v2",
-        "name": "OddsPortal Historical Scraper",
+        "name": "OddsPortal Historical Scraper V2",
         "category": "source",
         "icon": "Target",
         "description": "High-fidelity odds harvesting from active React DOM states.",
         "ui_schema": [
             {"field": "targetUrl", "type": "text", "label": "Target URL", "default": "https://www.oddsportal.com/football/england/premier-league/results/"},
             {"field": "maxWorkers", "type": "number", "label": "Max Concurrent Workers", "default": 2},
-            {"field": "headless", "type": "toggle", "label": "Run in Headless Mode", "default": True}
+            {"field": "headless", "type": "boolean", "label": "Run in Headless Mode", "default": True}
         ]
     }
 

@@ -7,6 +7,8 @@ export const useSettings = () => useContext(SettingsContext);
 const DEFAULT_SETTINGS = {
   primaryFont: 'Outfit',
   secondaryFont: 'Inter',
+  dataPreviewFont: 'Inter',
+  dataPreviewFontSize: '11.5',
   theme: 'light',
   canvasBackground: 'dots',
   wireStyle: 'default',
@@ -40,6 +42,8 @@ export const SettingsProvider = ({ children }) => {
     const root = document.documentElement;
     root.style.setProperty('--font-primary', `'${settings.primaryFont}', sans-serif`);
     root.style.setProperty('--font-secondary', `'${settings.secondaryFont}', sans-serif`);
+    root.style.setProperty('--font-data-preview', `'${settings.dataPreviewFont}', sans-serif`);
+    root.style.setProperty('--font-size-data-preview', `${settings.dataPreviewFontSize}px`);
     
     if (settings.secondaryFont === 'Geist Mono') {
         root.style.setProperty('--font-mono', `'Geist Mono', monospace`);

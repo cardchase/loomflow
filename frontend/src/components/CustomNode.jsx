@@ -177,7 +177,7 @@ const CustomNode = ({ id, data, selected, type }) => {
             onClick={(e) => handleAnchorClick(e, 'target', 'right')}
           />
         </>
-      ) : (!['file_input', 'fileInput', 'database_input', 'databaseInput', 'folder_input', 'folderInput', 'gcs_in', 'gcsIn', 'google_sheets_in', 'googleSheetsIn', 'odds_portal_scraper', 'oddsPortalScraper', 'odds_portal_upcoming', 'oddsPortalUpcoming'].includes(type)) ? (
+      ) : (!['file_input', 'fileInput', 'database_input', 'databaseInput', 'folder_input', 'folderInput', 'gcs_in', 'gcsIn', 'google_sheets_in', 'googleSheetsIn', 'odds_portal_scraper', 'oddsPortalScraper', 'odds_portal_scraper_v2', 'oddsPortalScraperV2', 'odds_portal_upcoming', 'oddsPortalUpcoming', 'odds_portal_upcoming_v2', 'oddsPortalUpcomingV2', 'odds_portal_intermediate', 'oddsPortalIntermediate'].includes(type)) ? (
         <Handle
           type="target"
           position={targetPosition}

@@ -114,6 +114,48 @@ const SettingsModal = ({ onClose }) => {
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
                 <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Data Preview Font</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Font used specifically for the data preview pane.</div>
+                </div>
+                <select 
+                  value={settings.dataPreviewFont}
+                  onChange={(e) => updateSettings({ dataPreviewFont: e.target.value })}
+                  style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid var(--border-dark)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-secondary)', fontWeight: 500 }}
+                >
+                  <option value="Inter">Inter</option>
+                  <option value="Outfit">Outfit</option>
+                  <option value="Geist">Geist</option>
+                  <option value="Geist Mono">Geist Mono</option>
+                  <option value="JetBrains Mono">JetBrains Mono</option>
+                  <option value="Fira Code">Fira Code</option>
+                  <option value="Fira Sans">Fira Sans</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Open Sans">Open Sans</option>
+                  <option value="system-ui">System Default</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Data Preview Font Size</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Adjust the size of text in the data preview.</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="number"
+                    min="8"
+                    max="24"
+                    step="0.5"
+                    value={settings.dataPreviewFontSize}
+                    onChange={(e) => updateSettings({ dataPreviewFontSize: e.target.value })}
+                    style={{ width: '70px', padding: '6px', borderRadius: '4px', border: '1px solid var(--border-dark)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-secondary)', fontWeight: 500, textAlign: 'center' }}
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>px</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <div>
                   <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Global Text Styling</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fun global overrides for all text.</div>
                 </div>
