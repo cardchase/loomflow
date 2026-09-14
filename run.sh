@@ -4,7 +4,7 @@
 set -e
 
 echo -e "\033[0;36m============================================="
-echo -e "        *** Welcome to VibeETL ***"
+echo -e "        *** Welcome to Loomflow ***"
 echo -e "=============================================\033[0m"
 echo ""
 
@@ -41,26 +41,26 @@ npm install
 
 # Trap to kill background processes on exit
 cleanup() {
-    echo -e "\033[0;33m\nShutting down VibeETL services...\033[0m"
+    echo -e "\033[0;33m\nShutting down Loomflow services...\033[0m"
     kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
 }
 trap cleanup EXIT
 
 # 3. Start Backend
-echo -e "\033[0;32m[3/4] Starting VibeETL Backend Engine...\033[0m"
+echo -e "\033[0;32m[3/4] Starting Loomflow Backend Engine...\033[0m"
 cd "$SCRIPT_DIR/backend"
 source venv/bin/activate
 python run.py &
 BACKEND_PID=$!
 
 # 4. Start Frontend
-echo -e "\033[0;32m[4/4] Starting VibeETL Frontend Dev Server...\033[0m"
+echo -e "\033[0;32m[4/4] Starting Loomflow Frontend Dev Server...\033[0m"
 cd "$SCRIPT_DIR/frontend"
 npm run dev &
 FRONTEND_PID=$!
 
 echo -e "\033[0;36m"
-echo "VibeETL has been launched!"
+echo "Loomflow has been launched!"
 echo "  - Backend Engine: http://127.0.0.1:8001"
 echo "  - Frontend Portal: http://localhost:5173"
 echo ""

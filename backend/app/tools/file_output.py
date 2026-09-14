@@ -58,7 +58,7 @@ class FileOutputNode(BaseNode):
         output_format = self.parameters.get("outputFormat", "csv").lower()
         
         # Smart detection for visualizations (HTML payloads)
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             output_format = "html"
             base, ext = os.path.splitext(file_path)
             if ext.lower() != ".html":
@@ -71,7 +71,7 @@ class FileOutputNode(BaseNode):
             os.makedirs(outputs_dir, exist_ok=True)
             file_path = os.path.join(outputs_dir, file_path)
 
-        # We intentionally bypass verify_safe_file_path here because VibeETL is a local tool
+        # We intentionally bypass verify_safe_file_path here because Loomflow is a local tool
         # and the user explicitly requested the ability to save output files anywhere on their system.
 
         self.log(f"Starting file write for path: {file_path}")
@@ -116,7 +116,7 @@ class FileOutputNode(BaseNode):
         }
 
     def _write_csv(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as a CSV. Please change the Output Format to HTML.")
             
         write_mode = self.parameters.get("writeMode", "overwrite").lower()
@@ -129,7 +129,7 @@ class FileOutputNode(BaseNode):
             df.write_csv(file_path)
         
     def _write_excel(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as an Excel file. Please change the Output Format to HTML.")
         
         sheet_name = self.parameters.get("sheetName", "Sheet1")
@@ -151,19 +151,19 @@ class FileOutputNode(BaseNode):
         df.write_excel(file_path, worksheet=sheet_name)
 
     def _write_parquet(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as a Parquet file. Please change the Output Format to HTML.")
         self.log(f"Writing Parquet file to {file_path}")
         df.write_parquet(file_path)
 
     def _write_json(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as a JSON file. Please change the Output Format to HTML.")
         self.log(f"Writing JSON file to {file_path}")
         df.write_json(file_path)
 
     def _write_jsonl(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as a JSONL file. Please change the Output Format to HTML.")
             
         write_mode = self.parameters.get("writeMode", "overwrite").lower()
@@ -176,18 +176,18 @@ class FileOutputNode(BaseNode):
             df.write_ndjson(file_path)
 
     def _write_avro(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" in df.columns:
+        if "__loomflow_html_payload__" in df.columns:
             raise ValueError("Attempted to write an HTML payload as an Avro file. Please change the Output Format to HTML.")
         self.log(f"Writing Avro file to {file_path}")
         df.write_avro(file_path)
 
     def _write_html_payload(self, df: pl.DataFrame, file_path: str) -> None:
-        if "__vibe_html_payload__" not in df.columns:
+        if "__loomflow_html_payload__" not in df.columns:
             raise ValueError("Output Format is set to HTML, but upstream node did not provide an HTML payload.")
             
         self.log(f"Writing HTML payload to {file_path}")
         
-        html_str = df["__vibe_html_payload__"][0]
+        html_str = df["__loomflow_html_payload__"][0]
         if not html_str:
             raise ValueError("HTML payload was empty.")
             

@@ -1290,4 +1290,4 @@
 }
 
 /* Ensure React Flow wrapper is exact size for collision */
-.react-flow__node-vibeNode { width: 34px !important; height: 34px !important; min-width: 34px !important; min-height: 34px !important; }
+.react-flow__node-loomflowNode { width: 34px !important; height: 34px !important; min-width: 34px !important; min-height: 34px !important; }

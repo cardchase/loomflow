@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState(() => {
     try {
-      const saved = localStorage.getItem('vibeetl_settings');
+      const saved = localStorage.getItem('loomflow_settings');
       if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } catch (e) {
       console.warn("Failed to load settings", e);
@@ -28,7 +28,7 @@ export const SettingsProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('vibeetl_settings', JSON.stringify(settings));
+    localStorage.setItem('loomflow_settings', JSON.stringify(settings));
     
     // Apply theme & text styles
     document.documentElement.setAttribute('data-theme', settings.theme);

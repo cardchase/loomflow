@@ -21,7 +21,7 @@ def verify_safe_table_destination(table_name: str) -> None:
         )
         
     # Guard internal operational database system catalogs from destructive overwrites
-    restricted_catalogs = {"pg_stat", "information_schema", "sqlite_master", "mysql", "sys", "vibe_workspace"}
+    restricted_catalogs = {"pg_stat", "information_schema", "sqlite_master", "mysql", "sys", "loomflow_workspace"}
     if table_name.lower() in restricted_catalogs or any(table_name.lower().startswith(r) for r in restricted_catalogs):
         raise SecurityError(
             f"Security Intercept: Target destination identifier '{table_name}' matches a restricted system directory. "
@@ -239,7 +239,7 @@ class DatabaseOutputExecutor(BaseNode):
                     if missing_pks:
                         raise ValueError(f"Primary keys {missing_pks} not found in the incoming dataset.")
                         
-                    staging_table = f"vibe_stage_{uuid.uuid4().hex[:8]}"
+                    staging_table = f"loomflow_stage_{uuid.uuid4().hex[:8]}"
                     self.log(f"Deploying isolated staging table: {staging_table}")
                     
                     # Dump data to staging table

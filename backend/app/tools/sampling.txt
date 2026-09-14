@@ -1,6 +1,6 @@
 Sampling Node
 
-The Sample Records node allows you to quickly isolate a subset of your dataset. This is highly useful for drastically reducing the size of massive datasets during the pipeline design phase, allowing the VibeETL engine to run sub-millisecond tests.
+The Sample Records node allows you to quickly isolate a subset of your dataset. This is highly useful for drastically reducing the size of massive datasets during the pipeline design phase, allowing the Loomflow engine to run sub-millisecond tests.
 
 **Sample Methods**:
 1. **First N Records**: Extracts the first N rows from the top of the dataset.

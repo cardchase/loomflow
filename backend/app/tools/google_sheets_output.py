@@ -60,7 +60,7 @@ class GoogleSheetsOutputNode(BaseNode):
         if not gspread:
             raise ImportError("Required packages are missing. Please run 'pip install gspread google-auth-oauthlib'.")
             
-        GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.vibe', 'google_auth'))
+        GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.loomflow', 'google_auth'))
         token_path = os.path.join(GOOGLE_AUTH_DIR, 'token.json')
         service_account_path = os.path.join(GOOGLE_AUTH_DIR, 'service_account.json')
         
@@ -88,13 +88,13 @@ class GoogleSheetsOutputNode(BaseNode):
             
             # ULTIMATE BYPASS: Globally disable SSL verification for all requests.Session calls.
             # This forces google-auth's internal token refresh to bypass Zscaler.
-            if not getattr(requests.Session, '_vibe_ssl_patched', False):
+            if not getattr(requests.Session, '_loomflow_ssl_patched', False):
                 old_request = requests.Session.request
                 def new_request(self, method, url, **kwargs):
                     kwargs['verify'] = False
                     return old_request(self, method, url, **kwargs)
                 requests.Session.request = new_request
-                requests.Session._vibe_ssl_patched = True
+                requests.Session._loomflow_ssl_patched = True
             
             client = gspread.authorize(creds)
             return client

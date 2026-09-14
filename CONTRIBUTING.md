@@ -1,8 +1,8 @@
-# Contributing to VibeETL
+# Contributing to Loomflow
 
-Welcome to VibeETL! We are thrilled that you want to contribute to our drag-and-drop data engineering platform.
+Welcome to Loomflow! We are thrilled that you want to contribute to our drag-and-drop data engineering platform.
 
-Because VibeETL's architecture is fully manifest-driven (the frontend UI automatically builds itself based on the backend node's `MANIFEST`), expanding the tool palette is incredibly easy. You only need to write a single Python file!
+Because Loomflow's architecture is fully manifest-driven (the frontend UI automatically builds itself based on the backend node's `MANIFEST`), expanding the tool palette is incredibly easy. You only need to write a single Python file!
 
 In fact, it is so easy that **you can generate entire nodes using AI coding assistants in less than 5 minutes.**
 
@@ -11,8 +11,8 @@ In fact, it is so easy that **you can generate entire nodes using AI coding assi
 If you want to contribute a new node (like a special data cleanser, a statistical model, or a new API connector), just copy and paste the following prompt into your favorite AI coding assistant (like Gemini, ChatGPT, or Claude):
 
 ```markdown
-I am contributing a new data processing node to the open-source VibeETL project. 
-VibeETL is a manifest-driven React Flow application with a Python/Polars backend. 
+I am contributing a new data processing node to the open-source Loomflow project. 
+Loomflow is a manifest-driven React Flow application with a Python/Polars backend. 
 To create a new tool, I only need to create ONE Python file in the `backend/app/tools/` directory.
 
 Please write the Python file for a new node that does: [DESCRIBE YOUR NODE'S PURPOSE HERE, e.g., "Removes all duplicate rows based on a selected column"].

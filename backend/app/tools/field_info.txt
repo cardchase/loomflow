@@ -9,6 +9,6 @@ Parameters:
 Schema Output: Outputs a fixed data frame containing exactly 5 columns:
 - Name (String): The name of the incoming column.
 - Type (String): The foundational Polars data type (e.g. Int64, String, Date).
-- Semantic_Type (String): VibeETL logical type detected (e.g. currency_usd).
+- Semantic_Type (String): Loomflow logical type detected (e.g. currency_usd).
 - Null_Count (Int64): The count of null or empty values present in that column.
 - Sample_Value (String): A stringified sample of the first valid data point in the column.

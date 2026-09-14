@@ -1,6 +1,6 @@
 # Building Cross-Platform Executables for Web Apps
 
-Packaging a full-stack application (like VibeETL, which has a React frontend and a Python backend) into a single, double-clickable executable (EXE) is a fascinating process. Unlike a simple C++ script that compiles directly into machine code, web apps require bundling multiple environments (Node.js, Python, a web server, and a browser engine) into one package.
+Packaging a full-stack application (like Loomflow, which has a React frontend and a Python backend) into a single, double-clickable executable (EXE) is a fascinating process. Unlike a simple C++ script that compiles directly into machine code, web apps require bundling multiple environments (Node.js, Python, a web server, and a browser engine) into one package.
 
 Here is an educational breakdown of how the industry achieves this across Windows, macOS, and Linux.
 
@@ -8,7 +8,7 @@ Here is an educational breakdown of how the industry achieves this across Window
 
 ## 1. The Core Challenge
 
-When you run VibeETL right now, you are running two distinct processes:
+When you run Loomflow right now, you are running two distinct processes:
 1. **The Backend:** A Python server (`run.py`) running in a Python interpreter.
 2. **The Frontend:** A Vite/React development server (`npm run dev`) rendering in your web browser.
 
@@ -60,19 +60,19 @@ Electron embeds the Chromium browser engine and Node.js.
 
 ---
 
-## 4. How VibeETL Could Be Packaged
+## 4. How Loomflow Could Be Packaged
 
-If we were to convert VibeETL into a desktop app, here is the exact architectural pipeline we would build:
+If we were to convert Loomflow into a desktop app, here is the exact architectural pipeline we would build:
 
 ```mermaid
 flowchart TD
     subgraph Build Phase
         A[npm run build] -->|Generates static UI| B(dist/ folder)
-        C[PyInstaller] -->|Bundles backend & UI| D[VibeETL Backend Executable]
+        C[PyInstaller] -->|Bundles backend & UI| D[Loomflow Backend Executable]
     end
 
     subgraph Runtime Phase
-        E[Tauri / Electron App] -->|1. Spawns Child Process| F[Run VibeETL Backend]
+        E[Tauri / Electron App] -->|1. Spawns Child Process| F[Run Loomflow Backend]
         F -->|2. Opens API Port| G((Localhost:8000))
         E -->|3. Renders UI| H[Desktop UI Window]
     end
@@ -81,8 +81,8 @@ flowchart TD
 ### The Step-by-Step Workflow:
 1. **Compile the Frontend:** Run `npm run build` in the `frontend` folder to turn React into static CSS/JS.
 2. **Configure FastAPI/Python:** Tell the Python backend to serve the frontend's static `dist/` folder on the root URL (`/`).
-3. **Freeze the Backend:** Use `pyinstaller --onefile run.py` to create `vibe_etl.exe`. 
-4. **Wrap the UI:** Create a simple Tauri or Electron shell that launches `vibe_etl.exe` in the background and opens a desktop window pointing to the local server.
+3. **Freeze the Backend:** Use `pyinstaller --onefile run.py` to create `loomflow_etl.exe`. 
+4. **Wrap the UI:** Create a simple Tauri or Electron shell that launches `loomflow_etl.exe` in the background and opens a desktop window pointing to the local server.
 5. **Distribution:** Use a tool like `Inno Setup` (Windows) or `create-dmg` (Mac) to create an installer that users download.
 
 > [!IMPORTANT]

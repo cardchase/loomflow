@@ -194,13 +194,13 @@ input[type="checkbox"] {
 /* Custom Flashy Animated Wires (zoom zoom) */
 .react-flow__edge.animated path.react-flow__edge-path {
   stroke-dasharray: 10 15 !important;
-  animation: vibeetl-flow 0.4s linear infinite !important;
+  animation: loomflow-flow 0.4s linear infinite !important;
   stroke: var(--color-primary);
   stroke-width: 2.5;
   filter: drop-shadow(0 0 3px rgba(67, 97, 238, 0.4));
 }
 
-@keyframes vibeetl-flow {
+@keyframes loomflow-flow {
   from { stroke-dashoffset: 25; }
   to { stroke-dashoffset: 0; }
 }

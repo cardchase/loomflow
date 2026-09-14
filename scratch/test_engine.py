@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, 'G:/My Drive/Projects/VibeETL/backend')
+sys.path.insert(0, 'G:/My Drive/Projects/Loomflow/backend')
 import json
 from app.engine import execute_pipeline
 

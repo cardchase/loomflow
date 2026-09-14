@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loomflow | Visual Data Pipeline Automation</title>
+    <meta name="description" content="Loomflow is a self-hosted, lightweight alternative to enterprise ETL platforms. Visual drag-and-drop ETL data pipeline automation canvas.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="../frontend/public/assets/loomflow_icon.svg">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="../frontend/public/assets/loomflow_icon.svg" alt="Loomflow Logo" class="logo-img">
+            <span>Loomflow</span>
+        </div>
+        <div class="nav-links">
+            <a href="https://github.com/loomflow/loomflow" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://loomflow.dev" class="btn">Get Started</a>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1>Weave Your Data <br> With <span>Loomflow</span></h1>
+            <p>A modern, visual data engineering platform co-created with AI. Drag, drop, and automate your entire ETL pipeline with lighting fast performance.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/loomflow/loomflow" class="btn primary">View on GitHub</a>
+                <a href="#features" class="btn secondary">Learn More</a>
+            </div>
+        </div>
+        
+        <div class="hero-image">
+            <img src="../docs/screenshot_workflow.png" alt="Loomflow Canvas Editor">
+        </div>
+    </main>
+
+    <section id="features" class="features">
+        <h2>Enterprise-Grade Visual ETL</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Lightning Fast</h3>
+                <p>Powered by Rust-based Polars for O(1) vectorization and in-memory execution.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Auto-Recover</h3>
+                <p>Zero data-loss auto-saving directly to your local browser cache.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">☁️</div>
+                <h3>Global Connectors</h3>
+                <p>Natively integrate with GCP, Postgres, SQLite, and more in seconds.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Loomflow Community. Open Source.</p>
+    </footer>
+</body>
+</html>

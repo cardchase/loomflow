@@ -14,7 +14,7 @@ class FieldInfoNode(BaseNode):
         "name": "Field Info",
         "description": "Output the schema metadata (Name, Type, Null Count, etc.) of the incoming data stream.",
         "icon": "Info",
-        "category": "preparation",
+        "category": "investigation",
         "ui_schema": []
     }
 

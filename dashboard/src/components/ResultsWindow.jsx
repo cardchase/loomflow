@@ -179,7 +179,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
     let clipboardText = '';
     const nodeLabel = selectedNode?.data?.label || selectedNode?.id || 'Unknown';
     const toolType = selectedNode?.data?.type || selectedNode?.type || 'Tool';
-    clipboardText += `[VibeETL Export] Tool: ${nodeLabel} (${toolType}) | Rows copied: ${rowsToCopy.length}\n`;
+    clipboardText += `[Loomflow Export] Tool: ${nodeLabel} (${toolType}) | Rows copied: ${rowsToCopy.length}\n`;
     
     if (includeHeaders) {
         clipboardText += headers + '\n';
@@ -193,14 +193,14 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
   }, [schema, selectedNode]);
 
   const handleExportHtml = () => {
-    if (!previewData || previewData.length === 0 || !previewData[0]['__vibe_html_payload__']) return;
+    if (!previewData || previewData.length === 0 || !previewData[0]['__loomflow_html_payload__']) return;
     
-    const htmlContent = previewData[0]['__vibe_html_payload__'];
+    const htmlContent = previewData[0]['__loomflow_html_payload__'];
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `VibeETL_Report_${selectedNode?.data?.label || 'export'}.html`;
+    a.download = `Loomflow_Report_${selectedNode?.data?.label || 'export'}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -332,7 +332,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
                 </div>
               )
             ) : status === 'success' || status === 'running' ? (
-              previewData.length > 0 && schema.some(c => c.name === '__vibe_html_payload__') ? (
+              previewData.length > 0 && schema.some(c => c.name === '__loomflow_html_payload__') ? (
                 <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc', padding: '20px', overflow: 'hidden', alignItems: 'flex-start', boxSizing: 'border-box' }}>
                   <div style={{ 
                     backgroundColor: 'white', 
@@ -382,7 +382,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
                       </button>
                     </div>
                     <iframe 
-                      srcDoc={previewData[0]['__vibe_html_payload__']} 
+                      srcDoc={previewData[0]['__loomflow_html_payload__']} 
                       style={{ 
                         width: '100%', 
                         height: 'calc(100% - 45px)', 
@@ -460,7 +460,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
                             
                             // Extract filename from Content-Disposition header if possible
                             const disposition = res.headers.get('Content-Disposition');
-                            let filename = `VibeETL_Export_${nodeId}_${activePort || 'output'}.csv`;
+                            let filename = `Loomflow_Export_${nodeId}_${activePort || 'output'}.csv`;
                             if (disposition && disposition.includes('filename=')) {
                                 const match = disposition.match(/filename="?([^"]+)"?/);
                                 if (match && match[1]) filename = match[1];

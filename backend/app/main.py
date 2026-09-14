@@ -26,7 +26,7 @@ from app.cache import cache_manager
 from app.tools.file_input import FileInputNode
 from app.tools import NODE_CLASSES
 
-app = FastAPI(title="VibeETL - Self-hosted Alteryx Engine")
+app = FastAPI(title="Loomflow - Self-hosted Alteryx Engine")
 
 # Configure CORS for Enterprise Security
 # Restrict origins strictly to the local frontend to prevent malicious websites from communicating with the local engine.
@@ -50,7 +50,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
 def read_root():
-    return {"message": "VibeETL Engine is running.", "status": "active"}
+    return {"message": "Loomflow Engine is running.", "status": "active"}
 
 import sys
 
@@ -414,7 +414,7 @@ def download_node_csv(nodeId: str, portId: str = "output", session_id: str = "de
     buffer = io.BytesIO()
     df.write_csv(buffer)
     
-    filename = f"VibeETL_Export_{nodeId}_{portId}.csv"
+    filename = f"Loomflow_Export_{nodeId}_{portId}.csv"
     headers = {
         'Content-Disposition': f'attachment; filename="{filename}"'
     }
@@ -513,7 +513,7 @@ async def autosave_workflow(pipeline: Dict[str, Any] = Body(...)):
 
 
 # --- Google Sheets Authentication Endpoints ---
-GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.vibe', 'google_auth'))
+GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.loomflow', 'google_auth'))
 os.makedirs(GOOGLE_AUTH_DIR, exist_ok=True)
 
 try:

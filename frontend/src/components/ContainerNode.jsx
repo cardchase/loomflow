@@ -8,14 +8,14 @@ const ContainerNode = ({ id, data, selected }) => {
   
   const handleToggle = (e) => {
     e.stopPropagation();
-    window.dispatchEvent(new CustomEvent('vibe-toggle-container', {
+    window.dispatchEvent(new CustomEvent('loomflow-toggle-container', {
       detail: { nodeId: id, enabled: !isEnabled }
     }));
   };
 
   const handleToggleMinimize = (e) => {
     e.stopPropagation();
-    window.dispatchEvent(new CustomEvent('vibe-toggle-minimize-container', {
+    window.dispatchEvent(new CustomEvent('loomflow-toggle-minimize-container', {
       detail: { nodeId: id, minimized: !isMinimized }
     }));
   };

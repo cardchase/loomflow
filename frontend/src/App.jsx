@@ -236,7 +236,7 @@ const getInitialTabs = () => {
   }));
 
   try {
-    const savedTabs = localStorage.getItem('vibeetl_autosave_workflow_tabs');
+    const savedTabs = localStorage.getItem('loomflow_autosave_workflow_tabs');
     if (savedTabs) {
       const parsed = JSON.parse(savedTabs);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -252,7 +252,7 @@ const getInitialTabs = () => {
         });
       }
     }
-    const savedSingle = localStorage.getItem('vibeetl_autosave_workflow');
+    const savedSingle = localStorage.getItem('loomflow_autosave_workflow');
     if (savedSingle) {
       const parsed = JSON.parse(savedSingle);
       return [{
@@ -322,14 +322,14 @@ function App({ isSandbox = false }) {
 
   const [isRunningMap, setIsRunningMap] = useState(() => {
     try {
-      const saved = localStorage.getItem('vibeetl_is_running_map');
+      const saved = localStorage.getItem('loomflow_is_running_map');
       if (saved) return JSON.parse(saved);
     } catch (e) {}
     return {};
   });
   
   useEffect(() => {
-    localStorage.setItem('vibeetl_is_running_map', JSON.stringify(isRunningMap));
+    localStorage.setItem('loomflow_is_running_map', JSON.stringify(isRunningMap));
   }, [isRunningMap]);
 
   const isRunning = isRunningMap[activeTabId] || false;
@@ -487,15 +487,15 @@ function App({ isSandbox = false }) {
       });
     };
 
-    window.addEventListener('vibe-undo', handleUndo);
-    window.addEventListener('vibe-redo', handleRedo);
+    window.addEventListener('loomflow-undo', handleUndo);
+    window.addEventListener('loomflow-redo', handleRedo);
     
     // Pass availability to a custom event if we want buttons to react, but for now we'll just check global length
-    window.dispatchEvent(new CustomEvent('vibe-history-update', { detail: { canUndo: past.length > 0, canRedo: future.length > 0 } }));
+    window.dispatchEvent(new CustomEvent('loomflow-history-update', { detail: { canUndo: past.length > 0, canRedo: future.length > 0 } }));
 
     return () => {
-      window.removeEventListener('vibe-undo', handleUndo);
-      window.removeEventListener('vibe-redo', handleRedo);
+      window.removeEventListener('loomflow-undo', handleUndo);
+      window.removeEventListener('loomflow-redo', handleRedo);
     };
   }, [setNodes, setEdges, past.length, future.length]);
 
@@ -504,8 +504,8 @@ function App({ isSandbox = false }) {
       setSelectedHandle(e.detail);
       setSelectedNodeId(e.detail.nodeId);
     };
-    window.addEventListener('vibe-handle-click', handleHandleClick);
-    return () => window.removeEventListener('vibe-handle-click', handleHandleClick);
+    window.addEventListener('loomflow-handle-click', handleHandleClick);
+    return () => window.removeEventListener('loomflow-handle-click', handleHandleClick);
   }, []);
 
   // Topological Sort for UI Node Numbering
@@ -917,22 +917,22 @@ function App({ isSandbox = false }) {
       ));
     };
 
-    window.addEventListener('vibe-create-container', handleCreateContainer);
-    window.addEventListener('vibe-toggle-container', handleToggleContainer);
-    window.addEventListener('vibe-toggle-minimize-container', handleToggleMinimizeContainer);
-    window.addEventListener('vibe-ungroup-container', handleUngroupContainer);
-    window.addEventListener('vibe-node-drag-stop', handleNodeDragStop);
-    window.addEventListener('vibe-create-comment', handleCreateComment);
-    window.addEventListener('vibe-update-comment', handleUpdateComment);
+    window.addEventListener('loomflow-create-container', handleCreateContainer);
+    window.addEventListener('loomflow-toggle-container', handleToggleContainer);
+    window.addEventListener('loomflow-toggle-minimize-container', handleToggleMinimizeContainer);
+    window.addEventListener('loomflow-ungroup-container', handleUngroupContainer);
+    window.addEventListener('loomflow-node-drag-stop', handleNodeDragStop);
+    window.addEventListener('loomflow-create-comment', handleCreateComment);
+    window.addEventListener('loomflow-update-comment', handleUpdateComment);
     
     return () => {
-      window.removeEventListener('vibe-create-container', handleCreateContainer);
-      window.removeEventListener('vibe-toggle-container', handleToggleContainer);
-      window.removeEventListener('vibe-toggle-minimize-container', handleToggleMinimizeContainer);
-      window.removeEventListener('vibe-ungroup-container', handleUngroupContainer);
-      window.removeEventListener('vibe-node-drag-stop', handleNodeDragStop);
-      window.removeEventListener('vibe-create-comment', handleCreateComment);
-      window.removeEventListener('vibe-update-comment', handleUpdateComment);
+      window.removeEventListener('loomflow-create-container', handleCreateContainer);
+      window.removeEventListener('loomflow-toggle-container', handleToggleContainer);
+      window.removeEventListener('loomflow-toggle-minimize-container', handleToggleMinimizeContainer);
+      window.removeEventListener('loomflow-ungroup-container', handleUngroupContainer);
+      window.removeEventListener('loomflow-node-drag-stop', handleNodeDragStop);
+      window.removeEventListener('loomflow-create-comment', handleCreateComment);
+      window.removeEventListener('loomflow-update-comment', handleUpdateComment);
     };
   }, [nodes, setNodes]);
 
@@ -991,7 +991,7 @@ function App({ isSandbox = false }) {
         const edgesToCopy = edges.filter(e => selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target));
         
         if (nodesToCopy.length > 0) {
-          localStorage.setItem('vibeetl_clipboard', JSON.stringify({ nodes: nodesToCopy, edges: edgesToCopy }));
+          localStorage.setItem('loomflow_clipboard', JSON.stringify({ nodes: nodesToCopy, edges: edgesToCopy }));
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
         e.preventDefault();
@@ -1005,7 +1005,7 @@ function App({ isSandbox = false }) {
         const edgesToCopy = edges.filter(e => selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target));
         
         if (nodesToCopy.length > 0) {
-          localStorage.setItem('vibeetl_clipboard', JSON.stringify({ nodes: nodesToCopy, edges: edgesToCopy }));
+          localStorage.setItem('loomflow_clipboard', JSON.stringify({ nodes: nodesToCopy, edges: edgesToCopy }));
           
           setNodes(nds => nds.filter(n => !selectedNodeIds.includes(n.id)));
           setEdges(eds => eds.filter(edge => 
@@ -1022,7 +1022,7 @@ function App({ isSandbox = false }) {
         setEdges(eds => eds.map(edge => ({ ...edge, selected: true })));
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         e.preventDefault();
-        const clipboard = localStorage.getItem('vibeetl_clipboard');
+        const clipboard = localStorage.getItem('loomflow_clipboard');
         if (clipboard) {
           try {
             const parsed = JSON.parse(clipboard);
@@ -1130,8 +1130,8 @@ function App({ isSandbox = false }) {
     });
     
     try {
-      localStorage.setItem('vibeetl_autosave_workflow', JSON.stringify({ nodes, edges }));
-      localStorage.setItem('vibeetl_autosave_workflow_tabs', JSON.stringify(strippedTabs));
+      localStorage.setItem('loomflow_autosave_workflow', JSON.stringify({ nodes, edges }));
+      localStorage.setItem('loomflow_autosave_workflow_tabs', JSON.stringify(strippedTabs));
     } catch (err) {
       console.warn('LocalStorage quota exceeded. Falling back to backend autosave only.', err);
     }
@@ -1372,13 +1372,13 @@ function App({ isSandbox = false }) {
       type: node.type,
       parameters: node.data.parameters
     };
-    localStorage.setItem('vibe_copied_config', JSON.stringify(configData));
+    localStorage.setItem('loomflow_copied_config', JSON.stringify(configData));
   }, []);
 
   const handlePasteConfig = useCallback((targetNode) => {
     if (!targetNode) return;
     try {
-      const stored = localStorage.getItem('vibe_copied_config');
+      const stored = localStorage.getItem('loomflow_copied_config');
       if (!stored) {
         alert('No configuration copied.');
         return;
@@ -1939,7 +1939,7 @@ function App({ isSandbox = false }) {
                   if (!prev[tabId]) return prev;
                   const newMap = { ...prev };
                   newMap[tabId] = false;
-                  localStorage.setItem('vibeetl_is_running_map', JSON.stringify(newMap));
+                  localStorage.setItem('loomflow_is_running_map', JSON.stringify(newMap));
                   return newMap;
                 });
               }
@@ -2144,7 +2144,7 @@ function App({ isSandbox = false }) {
         const fileHandle = await window.showSaveFilePicker({
           suggestedName: `${activeTabName}.json`,
           types: [{
-            description: 'VibeETL Workflow',
+            description: 'Loomflow Workflow',
             accept: { 'application/json': ['.json'] },
           }],
         });
@@ -2332,7 +2332,7 @@ function App({ isSandbox = false }) {
     
     // Automatically fit view to show the newly spaced out workflow
     setTimeout(() => {
-      window.dispatchEvent(new Event('vibe-fit-view'));
+      window.dispatchEvent(new Event('loomflow-fit-view'));
     }, 50);
   };
 
@@ -2526,7 +2526,7 @@ function App({ isSandbox = false }) {
               Backend Disconnected
             </h2>
             <p style={{ margin: '0 0 32px 0', color: '#64748b', fontSize: '16px', lineHeight: '1.6' }}>
-              VibeETL has lost connection to the Python engine. Please ensure that <code style={{background: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', color: '#334155', fontWeight: 600}}>python run.py</code> is actively running in your terminal.
+              Loomflow has lost connection to the Python engine. Please ensure that <code style={{background: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', color: '#334155', fontWeight: 600}}>python run.py</code> is actively running in your terminal.
             </p>
             <div style={{
               display: 'inline-flex', alignItems: 'center', padding: '10px 20px',

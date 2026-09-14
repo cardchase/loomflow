@@ -41,7 +41,7 @@ class VisualizationNode(BaseNode):
         if not x_axis or not y_axis:
             if chart_type != 'sankey':
                 self.log("Missing X or Y axis configuration. Returning empty payload.")
-                return pl.DataFrame({"__vibe_html_payload__": [""]})
+                return pl.DataFrame({"__loomflow_html_payload__": [""]})
             
         self.log(f"Converting data for {chart_type} chart plotting...")
         
@@ -185,7 +185,7 @@ class VisualizationNode(BaseNode):
                 'modeBarButtonsToRemove': ['lasso2d', 'select2d'],
                 'toImageButtonOptions': {
                     'format': 'png',
-                    'filename': 'vibeetl_chart_export',
+                    'filename': 'loomflow_chart_export',
                     'height': 600,
                     'width': 800,
                     'scale': 2 # High res export (2x multiplier)
@@ -197,7 +197,7 @@ class VisualizationNode(BaseNode):
             
             self.log(f"Successfully generated {chart_type} chart and encoded to HTML payload.")
             # Pass the HTML string down the wire in a reserved column
-            return pl.DataFrame({"__vibe_html_payload__": [html_payload]})
+            return pl.DataFrame({"__loomflow_html_payload__": [html_payload]})
             
         except Exception as e:
             raise ValueError(f"Failed to generate {chart_type} chart: {e}")

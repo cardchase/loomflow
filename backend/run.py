@@ -4,7 +4,7 @@ import copy
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    print(f"Starting VibeETL Engine on port {port}...")
+    print(f"Starting Loomflow Engine on port {port}...")
     
     # Add timestamps to the terminal logs
     log_config = copy.deepcopy(uvicorn.config.LOGGING_CONFIG)

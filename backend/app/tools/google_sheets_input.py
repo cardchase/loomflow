@@ -4,7 +4,7 @@ import polars as pl
 from typing import Dict
 from app.tools.base import BaseNode
 
-GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.vibe', 'google_auth'))
+GOOGLE_AUTH_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '.loomflow', 'google_auth'))
 
 try:
     import gspread
@@ -79,13 +79,13 @@ class GoogleSheetsInputNode(BaseNode):
             
             # ULTIMATE BYPASS: Globally disable SSL verification for all requests.Session calls.
             # This forces google-auth's internal token refresh to bypass Zscaler.
-            if not getattr(requests.Session, '_vibe_ssl_patched', False):
+            if not getattr(requests.Session, '_loomflow_ssl_patched', False):
                 old_request = requests.Session.request
                 def new_request(self, method, url, **kwargs):
                     kwargs['verify'] = False
                     return old_request(self, method, url, **kwargs)
                 requests.Session.request = new_request
-                requests.Session._vibe_ssl_patched = True
+                requests.Session._loomflow_ssl_patched = True
             
             client = gspread.authorize(creds)
             return client

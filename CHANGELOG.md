@@ -1,7 +1,7 @@
-# VibeETL Developer Notes
+# Loomflow Developer Notes
 
 ## May 31, 2026 - Summary of Changes
-Today we implemented a significant number of architectural, backend, and UI/UX improvements to VibeETL. The primary focus was on extending the tool ecosystem and refining the canvas interaction model.
+Today we implemented a significant number of architectural, backend, and UI/UX improvements to Loomflow. The primary focus was on extending the tool ecosystem and refining the canvas interaction model.
 
 ### 1. New Database Integrations
 - Created `Database Input` and `Database Output` nodes.

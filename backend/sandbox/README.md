@@ -1,4 +1,4 @@
-# VibeETL Tool Sandbox
+# Loomflow Tool Sandbox
 
 This directory is an isolated sandbox environment for developing new tools without risking crashes to the main application execution engine.
 

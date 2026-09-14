@@ -1,6 +1,6 @@
-# VibeETL Node Reference Guide
+# Loomflow Node Reference Guide
 
-Welcome to the definitive reference for VibeETL's node library! This document explains how every tool works, its parameters, and provides concrete examples you can use to build powerful pipelines.
+Welcome to the definitive reference for Loomflow's node library! This document explains how every tool works, its parameters, and provides concrete examples you can use to build powerful pipelines.
 
 ---
 
@@ -35,7 +35,7 @@ Welcome to the definitive reference for VibeETL's node library! This document ex
     *   `outputPath`: Where to save the file (e.g., `C:/data/output.parquet`).
     *   `outputFormat`: Pick between `csv`, `excel`, `parquet`, `json`, `html`.
 *   **Example Use Case**: After cleaning your data, you want to archive it compactly. Connect your final node to File Output, select `parquet`, and write millions of rows in milliseconds. 
-*   **Pro Tip (Beautiful PDFs)**: VibeETL avoids bloated local PDF libraries. Instead, select **HTML (Interactive)**, open the generated `.html` in Chrome/Edge, and use `Ctrl+P -> Save as PDF` for a stunning report.
+*   **Pro Tip (Beautiful PDFs)**: Loomflow avoids bloated local PDF libraries. Instead, select **HTML (Interactive)**, open the generated `.html` in Chrome/Edge, and use `Ctrl+P -> Save as PDF` for a stunning report.
 
 ### 3. Database Input Node (`databaseInput`)
 *   **Purpose**: Execute SQL queries directly against massive relational databases.
@@ -60,13 +60,13 @@ Welcome to the definitive reference for VibeETL's node library! This document ex
 
 ### 5. Google Sheets Input & Output Nodes
 *   **Purpose**: Read and write data directly to live Google Sheets tabs.
-*   **Enterprise SSL Proxy Support**: VibeETL natively integrates with your Windows Certificate Store (via `truststore`). If you are behind a strict corporate firewall or MITM proxy (like Zscaler), VibeETL automatically inherits your browser's root certificates to seamlessly authenticate with Google without requiring complex SSL bypasses!
+*   **Enterprise SSL Proxy Support**: Loomflow natively integrates with your Windows Certificate Store (via `truststore`). If you are behind a strict corporate firewall or MITM proxy (like Zscaler), Loomflow automatically inherits your browser's root certificates to seamlessly authenticate with Google without requiring complex SSL bypasses!
 *   **Authentication Setup**: 
     - You only need to set this up **ONCE**! Click the "Cloud Connectors" button in the top toolbar.
     - Upload your Google Cloud `Service Account JSON` or `OAuth 2.0 Client Secret`.
     - **If using a Service Account**: A service account acts like a "robot" user. To read or write to private sheets, you MUST open your Google Sheet, click "Share", and add the Service Account's email address (found inside your JSON file as `client_email`) with Viewer or Editor permissions.
-    - **If using an OAuth 2.0 Client Secret**: You will be prompted to "Sign in with Google" via a popup to grant VibeETL access using your own Google account. Note: If your Google Cloud OAuth app is in "Testing" mode (the default), you must go to the Google Cloud Console (APIs & Services > OAuth consent screen) and add your personal email address to the **Test users** list before you can log in.
-    - VibeETL securely saves these credentials locally and will use them to authenticate *all* Google nodes automatically.
+    - **If using an OAuth 2.0 Client Secret**: You will be prompted to "Sign in with Google" via a popup to grant Loomflow access using your own Google account. Note: If your Google Cloud OAuth app is in "Testing" mode (the default), you must go to the Google Cloud Console (APIs & Services > OAuth consent screen) and add your personal email address to the **Test users** list before you can log in.
+    - Loomflow securely saves these credentials locally and will use them to authenticate *all* Google nodes automatically.
 *   **Parameters**:
     *   `spreadsheet_id_or_url`: Just paste the full `https://docs.google.com/...` URL! 
         - > [!WARNING]
@@ -150,17 +150,17 @@ Welcome to the definitive reference for VibeETL's node library! This document ex
 
 ## 🐍 The Ultimate Superpower: Python Code Node
 
-The Python Code node is an unrestricted sandbox. It runs in an isolated background process, meaning it has **zero artificial limits** and will never crash the VibeETL server. If there isn't a pre-built node for your use-case, you can just script it!
+The Python Code node is an unrestricted sandbox. It runs in an isolated background process, meaning it has **zero artificial limits** and will never crash the Loomflow server. If there isn't a pre-built node for your use-case, you can just script it!
 
 ### **How to Use It:**
 1. Your upstream data is automatically injected into the script as a variable named `df` (a Polars DataFrame).
 2. Write your custom Python logic.
-3. You **must** assign your final tabular result to a variable named `df_out`. VibeETL will extract `df_out` and pass it to downstream nodes.
+3. You **must** assign your final tabular result to a variable named `df_out`. Loomflow will extract `df_out` and pass it to downstream nodes.
 
 ### **Installing Missing Libraries:**
-Because scripts run on your local machine, you have access to your local environment! If you want to use a library like `requests`, `numpy`, or `transformers`, simply install it in your VibeETL backend environment:
+Because scripts run on your local machine, you have access to your local environment! If you want to use a library like `requests`, `numpy`, or `transformers`, simply install it in your Loomflow backend environment:
 ```bash
-# Open a terminal in the VibeETL/backend folder
+# Open a terminal in the Loomflow/backend folder
 pip install requests beautifulsoup4
 ```
 
@@ -205,7 +205,7 @@ df_out = df.with_columns(
 ```
 
 ### **Example 3: Nvidia GPU Acceleration (RAPIDS)**
-If you have a local Nvidia GPU, you can unleash it. VibeETL’s background process architecture allows you to offload your data directly into GPU VRAM for lightning-fast Machine Learning using Nvidia's RAPIDS libraries (`cudf`, `cuml`).
+If you have a local Nvidia GPU, you can unleash it. Loomflow’s background process architecture allows you to offload your data directly into GPU VRAM for lightning-fast Machine Learning using Nvidia's RAPIDS libraries (`cudf`, `cuml`).
 
 **Prerequisites**: You must install RAPIDS on your host machine.
 
@@ -230,12 +230,12 @@ gpu_model.fit(X_train, y_train)
 predictions = gpu_model.predict(X_train)
 gpu_df["Fraud_Prediction"] = predictions
 
-# 5. Bring the GPU table back to the host system and pass it to VibeETL
+# 5. Bring the GPU table back to the host system and pass it to Loomflow
 df_out = pl.from_pandas(gpu_df.to_pandas())
 ```
 
 ### **Example 4: The Interactive HTML Payload Trick**
-If you output a single column named exactly `__vibe_html_payload__`, VibeETL's Data Preview pane will magically render it as a website! You can build beautiful executive dashboards.
+If you output a single column named exactly `__loomflow_html_payload__`, Loomflow's Data Preview pane will magically render it as a website! You can build beautiful executive dashboards.
 
 ```python
 import polars as pl
@@ -253,11 +253,11 @@ html = f\"\"\"
 \"\"\"
 
 # Output the HTML payload
-df_out = pl.DataFrame({"__vibe_html_payload__": [html]})
+df_out = pl.DataFrame({"__loomflow_html_payload__": [html]})
 ```
 
 ### **Example 5: Audio DSP & Visualizer Prep (Multimodal)**
-VibeETL is not just for corporate data. You can process raw audio files, extract their features (like volume amplitude or tempo), and convert them into structured datasets for visualization.
+Loomflow is not just for corporate data. You can process raw audio files, extract their features (like volume amplitude or tempo), and convert them into structured datasets for visualization.
 
 **Prerequisites**: You must install `librosa` and `numpy` (`pip install librosa numpy`).
 
@@ -285,7 +285,7 @@ times = librosa.frames_to_time(frames, sr=sr, hop_length=hop_length)
 # 5. Extract the global Tempo (BPM)
 tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
 
-# 6. Build the Polars DataFrame to pass back to the VibeETL Canvas
+# 6. Build the Polars DataFrame to pass back to the Loomflow Canvas
 df_out = pl.DataFrame({
     "Time_Seconds": times,
     "Volume_RMS": rms_energy,
@@ -298,15 +298,15 @@ df_out = pl.DataFrame({
 
 ## 💾 Autosave & Disaster Recovery
 
-VibeETL features an enterprise-grade, two-tier auto-recovery system designed to ensure **Zero Data Loss**.
+Loomflow features an enterprise-grade, two-tier auto-recovery system designed to ensure **Zero Data Loss**.
 
 ### Tier 1: Local Browser Cache (Instant)
-Every time you move a node, connect a wire, or change a setting, VibeETL instantly caches your entire canvas to your browser's local storage. If you accidentally refresh the page or close your browser tab, your workflow will immediately restore exactly as you left it the next time you open the app.
+Every time you move a node, connect a wire, or change a setting, Loomflow instantly caches your entire canvas to your browser's local storage. If you accidentally refresh the page or close your browser tab, your workflow will immediately restore exactly as you left it the next time you open the app.
 
 ### Tier 2: Backend File Backups (Rolling)
-Every 2 seconds after you stop making changes, a background network process physically streams your entire workflow to the VibeETL backend server. 
+Every 2 seconds after you stop making changes, a background network process physically streams your entire workflow to the Loomflow backend server. 
 
-*   **Save Location:** These physical JSON backup files are securely stored on your computer inside the `VibeETL/backend/.autosaves/` directory.
+*   **Save Location:** These physical JSON backup files are securely stored on your computer inside the `Loomflow/backend/.autosaves/` directory.
 *   **File Naming:** The files are dynamically named using the title of your active tab, followed by a timestamp (e.g., `My_Data_Pipeline_autosave_20260601_151729.json`).
 *   **Rolling Backups:** To prevent your hard drive from filling up, the backend maintains a strict rolling limit of the **10 most recent saves**. Older autosaves are automatically deleted.
 

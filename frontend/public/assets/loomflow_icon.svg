@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Frame Gradient -->
+    <linearGradient id="barGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Flowing Stream Gradients -->
+    <linearGradient id="streamGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+
+    <linearGradient id="streamGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+
+    <linearGradient id="streamGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Subtle Drop Shadow -->
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Top Enclosure Bar -->
+  <rect x="0" y="0" width="512" height="92" rx="22" fill="url(#barGradient)" stroke="#334155" stroke-width="2" />
+
+  <!-- Bottom Enclosure Bar -->
+  <rect x="0" y="420" width="512" height="92" rx="22" fill="url(#barGradient)" stroke="#334155" stroke-width="2" />
+
+  <!-- Flow Paths & Connectors -->
+  <g filter="url(#softGlow)" fill="none" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Stream 1 (Pink to Violet) -->
+    <path d="M 20 166 C 100 166, 170 200, 256 280 C 330 350, 350 356, 415 356" stroke="url(#streamGrad1)" />
+    <path d="M 395 328 L 435 356 L 395 384" stroke="#8B5CF6" />
+
+    <!-- Stream 2 (Sky to Indigo) -->
+    <path d="M 20 256 C 140 256, 170 215, 256 182 C 320 156, 360 156, 415 156" stroke="url(#streamGrad2)" />
+    <path d="M 395 128 L 435 156 L 395 184" stroke="#6366F1" />
+
+    <!-- Stream 3 (Emerald to Cyan) -->
+    <path d="M 20 346 C 120 346, 210 320, 256 288 C 320 244, 380 256, 465 256" stroke="url(#streamGrad3)" />
+    <path d="M 460 228 L 490 256 L 460 284" stroke="#06B6D4" />
+  </g>
+</svg>

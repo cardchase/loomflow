@@ -18,7 +18,7 @@ import ContainerNode from './ContainerNode';
 import { useSettings } from '../contexts/SettingsContext';
 
 const nodeTypes = {
-  vibeNode: CustomNode,
+  loomflowNode: CustomNode,
   container: ContainerNode
 };
 
@@ -31,8 +31,8 @@ const FindNodePanel = ({ nodes, onNodeSelect }) => {
     const handleOpenFind = () => {
       setIsOpen(true);
     };
-    window.addEventListener('vibe-open-find', handleOpenFind);
-    return () => window.removeEventListener('vibe-open-find', handleOpenFind);
+    window.addEventListener('loomflow-open-find', handleOpenFind);
+    return () => window.removeEventListener('loomflow-open-find', handleOpenFind);
   }, []);
 
   const matchingNodes = query.trim() ? nodes.filter(n => 
@@ -178,8 +178,8 @@ const CanvasContent = ({
         }
       }, 50);
     };
-    window.addEventListener('vibe-fit-view', handleFitView);
-    return () => window.removeEventListener('vibe-fit-view', handleFitView);
+    window.addEventListener('loomflow-fit-view', handleFitView);
+    return () => window.removeEventListener('loomflow-fit-view', handleFitView);
   }, [fitView, getViewport, setViewport, getNodes, onMoveEnd]);
 
   const onDragOver = useCallback((event) => {
@@ -345,8 +345,8 @@ const CanvasContent = ({
         onAddNode(type, position, anchorNodeId, splitEdgeId);
       }
     };
-    window.addEventListener('vibe-add-node', handleAddNodeEvent);
-    return () => window.removeEventListener('vibe-add-node', handleAddNodeEvent);
+    window.addEventListener('loomflow-add-node', handleAddNodeEvent);
+    return () => window.removeEventListener('loomflow-add-node', handleAddNodeEvent);
   }, [screenToFlowPosition, onAddNode, nodes, setCenter, getViewport]);
 
   return (
@@ -485,7 +485,7 @@ const CanvasContent = ({
                 maxY += 40;
 
                 // Fire custom event to create container and group nodes
-                window.dispatchEvent(new CustomEvent('vibe-create-container', {
+                window.dispatchEvent(new CustomEvent('loomflow-create-container', {
                   detail: {
                     x: minX,
                     y: minY,
@@ -540,7 +540,7 @@ const CanvasContent = ({
         defaultViewport={initialViewport || { x: 50, y: 50, zoom: 1.0 }}
       >
         <Controls showInteractive={false} showFitView={false} style={{ bottom: 15, left: 15 }}>
-          <ControlButton onClick={() => window.dispatchEvent(new Event('vibe-fit-view'))} title="fit view">
+          <ControlButton onClick={() => window.dispatchEvent(new Event('loomflow-fit-view'))} title="fit view">
             <Maximize size={16} />
           </ControlButton>
         </Controls>

@@ -133,7 +133,7 @@ const CustomNode = ({ id, data, selected, type }) => {
 
   const handleAnchorClick = (e, handleType, handleId) => {
     e.stopPropagation();
-    window.dispatchEvent(new CustomEvent('vibe-handle-click', { 
+    window.dispatchEvent(new CustomEvent('loomflow-handle-click', { 
       detail: { nodeId: id, handleType, handleId } 
     }));
   };

@@ -128,7 +128,7 @@ function App() {
     <div>
       <div className="dashboard-header">
         <div>
-          <h1 className="dashboard-title">VibeETL Predictions</h1>
+          <h1 className="dashboard-title">Loomflow Predictions</h1>
           <div className="dashboard-subtitle">
             <BrainCircuit size={18} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '8px' }} />
             AI-Driven Match Analytics & EV Hub

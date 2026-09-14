@@ -2,7 +2,7 @@ backend/app/__pycache__/
 backend/app/tools/__pycache__/
 backend/app/utils/__pycache__/
 backend/.autosaves/
-backend/.vibe/
+backend/.loomflow/
 backend/.vibe_cache/
 backend/uploads/
 backend/venv/

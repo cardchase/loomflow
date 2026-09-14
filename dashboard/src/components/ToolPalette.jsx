@@ -59,8 +59,8 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
       setCanUndo(e.detail.canUndo);
       setCanRedo(e.detail.canRedo);
     };
-    window.addEventListener('vibe-history-update', handleHistoryUpdate);
-    return () => window.removeEventListener('vibe-history-update', handleHistoryUpdate);
+    window.addEventListener('loomflow-history-update', handleHistoryUpdate);
+    return () => window.removeEventListener('loomflow-history-update', handleHistoryUpdate);
   }, []);
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
   // Favorites State
   const [favoriteToolIds, setFavoriteToolIds] = useState(() => {
     try {
-      const saved = localStorage.getItem('vibeetl_favorites');
+      const saved = localStorage.getItem('loomflow_favorites');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.warn("Failed to load favorites", e);
@@ -169,7 +169,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
       const newFavorites = prev.includes(toolId) 
         ? prev.filter(id => id !== toolId)
         : [...prev, toolId];
-      localStorage.setItem('vibeetl_favorites', JSON.stringify(newFavorites));
+      localStorage.setItem('loomflow_favorites', JSON.stringify(newFavorites));
       return newFavorites;
     });
   };
@@ -177,7 +177,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
   const resetFavorites = () => {
     const defaultFavs = ['fileInput', 'browse', 'select', 'formula', 'unique'];
     setFavoriteToolIds(defaultFavs);
-    localStorage.removeItem('vibeetl_favorites');
+    localStorage.removeItem('loomflow_favorites');
   };
 
   // Close dropdown when clicking outside
@@ -220,7 +220,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
       <div className="palette-logo">
         <div className="logo-icon">ETL</div>
         <div className="logo-text">
-          VibeETL
+          Loomflow
           {isSandbox && <span style={{ marginLeft: '10px', fontSize: '10px', background: '#ef4444', color: 'white', padding: '2px 6px', borderRadius: '4px', verticalAlign: 'middle', fontWeight: 'bold' }}>SANDBOX MODE</span>}
         </div>
       </div>
@@ -296,7 +296,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
                   <div 
                     key={tool.id}
                     onClick={() => {
-                      window.dispatchEvent(new CustomEvent('vibe-add-node', { detail: { type: tool.id } }));
+                      window.dispatchEvent(new CustomEvent('loomflow-add-node', { detail: { type: tool.id } }));
                       setIsDropdownOpen(false);
                       setSearchQuery('');
                     }}
@@ -342,7 +342,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
                     draggable
                     onDragStart={(e) => onDragStart(e, tool.id)}
                     onClick={() => {
-                      window.dispatchEvent(new CustomEvent('vibe-add-node', { detail: { type: tool.id } }));
+                      window.dispatchEvent(new CustomEvent('loomflow-add-node', { detail: { type: tool.id } }));
                     }}
                     onMouseEnter={(e) => {
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -486,7 +486,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
         <button 
           className="run-button" 
           style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', opacity: canUndo ? 1 : 0.5, cursor: canUndo ? 'pointer' : 'not-allowed' }} 
-          onClick={() => canUndo && window.dispatchEvent(new CustomEvent('vibe-undo'))} 
+          onClick={() => canUndo && window.dispatchEvent(new CustomEvent('loomflow-undo'))} 
           title="Undo"
         >
           <Icons.Undo size={16} />
@@ -494,7 +494,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
         <button 
           className="run-button" 
           style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', opacity: canRedo ? 1 : 0.5, cursor: canRedo ? 'pointer' : 'not-allowed' }} 
-          onClick={() => canRedo && window.dispatchEvent(new CustomEvent('vibe-redo'))} 
+          onClick={() => canRedo && window.dispatchEvent(new CustomEvent('loomflow-redo'))} 
           title="Redo"
         >
           <Icons.Redo size={16} />
@@ -516,7 +516,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
         <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={onSaveWorkflow} title="Save Workflow">
           <Save size={16} />
         </button>
-        <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => window.dispatchEvent(new CustomEvent('vibe-open-find'))} title="Find Tool on Canvas">
+        <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => window.dispatchEvent(new CustomEvent('loomflow-open-find'))} title="Find Tool on Canvas">
           <Search size={16} />
         </button>
         
@@ -617,7 +617,7 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
             </div>
             
             <p style={{ fontSize: '0.9rem', color: '#555555', margin: 0, lineHeight: 1.5 }}>
-              VibeETL needs credentials to bypass anonymous restrictions and access private Google Sheets.
+              Loomflow needs credentials to bypass anonymous restrictions and access private Google Sheets.
               You can upload either a <strong>Service Account JSON</strong> or an <strong>OAuth 2.0 Client Secret</strong>.
               <br/><br/>
               Don't have one? 

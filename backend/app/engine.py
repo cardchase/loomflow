@@ -111,9 +111,6 @@ def execute_pipeline(pipeline_data: Dict[str, Any]) -> Dict[str, Any]:
                     valid_tgt_ports = set()
                 elif tgt_type == "join":
                     valid_tgt_ports = {"left", "right"}
-                elif tgt_type == "predictor":
-                    valid_tgt_ports = {"historical", "upcoming", "input"}
-                
                 if src_port not in valid_src_ports or tgt_port not in valid_tgt_ports:
                     cache.add_global_log(f"Warning: Ignored phantom edge from {src_node.get('data', {}).get('label', src)} to {tgt_node.get('data', {}).get('label', tgt)} on invalid ports ({src_port} -> {tgt_port})")
                     continue

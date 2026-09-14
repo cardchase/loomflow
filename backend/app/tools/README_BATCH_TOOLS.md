@@ -1,6 +1,6 @@
-# VibeETL Batch Processing Tools Reference
+# Loomflow Batch Processing Tools Reference
 
-This document explains the architecture and usage of the batch processing tools in VibeETL.
+This document explains the architecture and usage of the batch processing tools in Loomflow.
 
 ## 1. Folder Input Tool (`folder_input.py`)
 **Purpose**: Scans a local directory and outputs a list of all files found within it.

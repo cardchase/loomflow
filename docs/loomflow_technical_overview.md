@@ -1,7 +1,7 @@
-# VibeETL: Technical Architecture & Deep Dive Guide
+# Loomflow: Technical Architecture & Deep Dive Guide
 
 ## 1. Project Overview & Capabilities
-**VibeETL** is a modern, node-based ETL (Extract, Transform, Load) desktop-class application designed to process tabular and multi-modal data. Built to rival enterprise platforms like Alteryx, it allows users to visually construct Directed Acyclic Graphs (DAGs) on a canvas to orchestrate complex data flows.
+**Loomflow** is a modern, node-based ETL (Extract, Transform, Load) desktop-class application designed to process tabular and multi-modal data. Built to rival enterprise platforms like Alteryx, it allows users to visually construct Directed Acyclic Graphs (DAGs) on a canvas to orchestrate complex data flows.
 
 ### Core Capabilities
 *   **Visual Pipeline Orchestration**: Users drag and drop nodes (tools) onto a canvas, connecting them via ports to define the topological flow of data.
@@ -51,7 +51,7 @@ When critically reviewing the architecture, please consider the following ongoin
 
 ### A. UI-to-Backend State Synchronization
 *   **Challenge**: The frontend attempts to eagerly resolve dynamic schemas (e.g., knowing what columns exist) so users can pick columns in dropdowns *before* the pipeline is run. However, complex transformations (like Python Code nodes or dynamic Regex parsing) make it impossible for the frontend to predict the schema perfectly.
-*   **Current Workaround**: We rely heavily on passing `"__vibe_html_payload__"` or basic string schemas, but a stronger contract between the execution engine's schema prediction and the UI is needed.
+*   **Current Workaround**: We rely heavily on passing `"__loomflow_html_payload__"` or basic string schemas, but a stronger contract between the execution engine's schema prediction and the UI is needed.
 
 ### B. Python Code Node Sandboxing
 *   **Challenge**: The `Python Code` node executes raw Python via `exec()`. While this gives ultimate flexibility to the user, it is highly volatile.
@@ -62,7 +62,7 @@ When critically reviewing the architecture, please consider the following ongoin
 *   **Current Workaround**: We enforce heavy pagination and strict row limits (e.g., `.head(100)`) when serializing for the frontend. However, this restricts users from searching through the tail-end of their data easily within the UI.
 
 ### D. Multi-Modal Data Routing
-*   **Challenge**: VibeETL supports Multi-Modal data (images, HTML dashboards) flowing through the same edges as tabular data. Since Polars is designed strictly for tabular structures, we currently hack this by storing HTML strings or Base64 encoded images inside a standard Polars String column (`__vibe_html_payload__`).
+*   **Challenge**: Loomflow supports Multi-Modal data (images, HTML dashboards) flowing through the same edges as tabular data. Since Polars is designed strictly for tabular structures, we currently hack this by storing HTML strings or Base64 encoded images inside a standard Polars String column (`__loomflow_html_payload__`).
 *   **Pain Point**: While effective, this creates friction when standard tabular nodes (like `Filter` or `Sort`) accidentally intercept these specialized payload columns.
 
 ### E. File System Concurrency and Access

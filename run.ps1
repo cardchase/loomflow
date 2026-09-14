@@ -4,7 +4,7 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 > $null
 
 Write-Host "========================================================" -ForegroundColor Cyan
-Write-Host "                 *** Welcome to VibeETL ***                 " -ForegroundColor Cyan
+Write-Host "                 *** Welcome to Loomflow ***                 " -ForegroundColor Cyan
 Write-Host "========================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -43,7 +43,7 @@ Pop-Location
 
 try {
     # 3. Find Free Port for Backend
-    Write-Host "[3/4] Finding free port for VibeETL Backend Engine..." -ForegroundColor Green
+    Write-Host "[3/4] Finding free port for Loomflow Backend Engine..." -ForegroundColor Green
     $BackendPort = 8001
     while ($true) {
         $portInUse = Get-NetTCPConnection -LocalPort $BackendPort -ErrorAction SilentlyContinue
@@ -64,11 +64,11 @@ try {
     $BackendProcess = Start-Process -FilePath "$VenvDir\Scripts\python.exe" -ArgumentList "run.py" -WorkingDirectory $BackendDir -PassThru -WindowStyle Hidden
 
     # 4. Start Frontend in background
-    Write-Host "[4/4] Starting VibeETL Frontend Dev Server..." -ForegroundColor Green
+    Write-Host "[4/4] Starting Loomflow Frontend Dev Server..." -ForegroundColor Green
     $FrontendProcess = Start-Process -FilePath "npm.cmd" -ArgumentList "run dev" -WorkingDirectory $FrontendDir -PassThru -WindowStyle Hidden
 
     Write-Host ""
-    Write-Host "VibeETL has been launched successfully!" -ForegroundColor Cyan
+    Write-Host "Loomflow has been launched successfully!" -ForegroundColor Cyan
     Write-Host "  - Backend Engine:  http://127.0.0.1:$BackendPort" -ForegroundColor Gray
     Write-Host "  - Frontend Portal: http://localhost:5173" -ForegroundColor Gray
     Write-Host ""

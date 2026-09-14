@@ -27,7 +27,7 @@ const CommentNode = ({ id, data, selected }) => {
   const handleBlur = () => {
     setIsEditing(false);
     if (editText !== initialText) {
-      window.dispatchEvent(new CustomEvent('vibe-update-comment', {
+      window.dispatchEvent(new CustomEvent('loomflow-update-comment', {
         detail: { nodeId: id, text: editText }
       }));
     }

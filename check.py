@@ -1,4 +1,4 @@
-import sys; sys.path.insert(0, r'd:\Project\VibeETL - Copy\backend'); from app.tools import NODE_CLASSES;
+import sys; sys.path.insert(0, r'd:\Project\Loomflow - Copy\backend'); from app.tools import NODE_CLASSES;
 for k, v in NODE_CLASSES.items():
     if hasattr(v, 'MANIFEST'):
         inputs = v.MANIFEST.get('inputs')

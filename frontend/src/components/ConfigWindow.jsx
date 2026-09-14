@@ -3446,7 +3446,6 @@ const ConfigWindow = ({ selectedNode, upstreamSchema, onUpdateParams, availableT
            type === 'join' ? renderJoinConfig() :
            type === 'sampling' ? renderSamplingConfig() :
            type === 'summarize' ? renderSummarizeConfig() :
-           (type === 'odds_portal_scraper' || type === 'odds_portal_upcoming') ? renderOddsPortalScraperConfig() :
            (toolDef && toolDef.ui_schema && toolDef.ui_schema.length > 0) ? renderDynamicForm(toolDef.ui_schema) : renderEmptyState()}
         </div>
       </div>

@@ -4,7 +4,7 @@ import { API_BASE } from '../config';
 
 export default function ChatPanel({ isOpen, onClose, nodes, edges }) {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I am the VibeETL Assistant powered by Gemini. How can I help you today?' }
+    { role: 'assistant', content: 'Hi! I am the Loomflow Assistant powered by Gemini. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

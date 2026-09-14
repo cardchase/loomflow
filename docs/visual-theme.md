@@ -1,6 +1,6 @@
-# VibeETL UI/UX Visual Theme & Architecture Specification
+# Loomflow UI/UX Visual Theme & Architecture Specification
 
-This document defines the unified visual design language, layout hierarchy, and interface design token standards for the **VibeETL** platform. All frontend components, themes, node definitions, and styling mechanisms must adhere strictly to these constraints to deliver a professional, enterprise-grade ETL experience mirroring production standards.
+This document defines the unified visual design language, layout hierarchy, and interface design token standards for the **Loomflow** platform. All frontend components, themes, node definitions, and styling mechanisms must adhere strictly to these constraints to deliver a professional, enterprise-grade ETL experience mirroring production standards.
 
 ---
 
@@ -48,7 +48,7 @@ The platform relies on a strict set of semantic tokens. Hardcoded hex values mus
 
 ## 3. Tool Category Color Coding System
 
-VibeETL classification colors are systematically aligned with categorical functions, easing user readability during complex graph builds:
+Loomflow classification colors are systematically aligned with categorical functions, easing user readability during complex graph builds:
 
 | Functional Category | Base Hex Code | Accent Glow / Hover State Ring | Intended Pipeline Operations |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ Labels must never occupy the interior space of a node. They are arranged vertica
 
 ## 6. Layout Composition & Interface Responsiveness
 
-The VibeETL application operates on a zero-scrolling view layout structured around a 3-Panel Docking model:
+The Loomflow application operates on a zero-scrolling view layout structured around a 3-Panel Docking model:
 
 ### Top Navigation & Tool Drawer
 

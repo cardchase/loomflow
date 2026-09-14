@@ -28,12 +28,12 @@ class ReportBuilderNode(BaseNode):
     def execute(self, inputs: Dict[str, pl.DataFrame]) -> pl.DataFrame:
         if not inputs:
             self.log("Waiting for upstream connection...")
-            return pl.DataFrame({"__vibe_html_payload__": pl.Series(dtype=pl.Utf8)})
+            return pl.DataFrame({"__loomflow_html_payload__": pl.Series(dtype=pl.Utf8)})
             
         df = list(inputs.values())[0]
         if df is None or df.height == 0:
             self.log("Received empty upstream dataset. Waiting for data...")
-            return df.with_columns(pl.Series("__vibe_html_payload__", dtype=pl.Utf8))
+            return df.with_columns(pl.Series("__loomflow_html_payload__", dtype=pl.Utf8))
 
         markdown_col = self.parameters.get("markdownColumn", "Description")
         theme = self.parameters.get("reportTheme", "Light (Elegant)")
@@ -239,5 +239,5 @@ class ReportBuilderNode(BaseNode):
             
         self.log(f"Successfully compiled {len(html_payloads)} Markdown reports into styled HTML.")
 
-        # Add the __vibe_html_payload__ column which is magically recognized by the Browse node
-        return df.with_columns(pl.Series("__vibe_html_payload__", html_payloads))
+        # Add the __loomflow_html_payload__ column which is magically recognized by the Browse node
+        return df.with_columns(pl.Series("__loomflow_html_payload__", html_payloads))

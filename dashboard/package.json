@@ -1,5 +1,5 @@
 {
-  "name": "vibe-etl-frontend",
+  "name": "loomflow-etl-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",

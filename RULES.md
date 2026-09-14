@@ -1,9 +1,9 @@
-# VibeETL AI Agent Rules and Design Patterns
+# Loomflow AI Agent Rules and Design Patterns
 
-When assisting with VibeETL, please strictly adhere to the following design patterns and platform rules:
+When assisting with Loomflow, please strictly adhere to the following design patterns and platform rules:
 
 ## 1. Platform Philosophy
-VibeETL is modeled after enterprise data engineering tools (like Alteryx). It features a visual DAG (Directed Acyclic Graph) canvas where nodes represent data operations (inputs, transforms, filters, joins, outputs).
+Loomflow is modeled after enterprise data engineering tools (like Alteryx). It features a visual DAG (Directed Acyclic Graph) canvas where nodes represent data operations (inputs, transforms, filters, joins, outputs).
 
 ## 2. Core Features
 - **1-to-N Branching:** Output from any single node port can be routed to multiple downstream nodes simultaneously. This is fully supported natively by the frontend (React Flow) and backend (Polars immutable DataFrames).

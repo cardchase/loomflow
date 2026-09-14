@@ -16,7 +16,7 @@ class PipelineCache:
         self._is_running: bool = False
         
         self.session_id = session_id
-        self.cache_dir = Path(f".vibe_cache/{session_id}")
+        self.cache_dir = Path(f".loomflow_cache/{session_id}")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def cancel_pipeline(self):
