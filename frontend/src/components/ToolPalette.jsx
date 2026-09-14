@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import * as Icons from 'lucide-react';
-import { Play, RefreshCw, Save, FolderOpen, Database, Bot, Search, Plus, X, Star, Maximize, Minimize, Columns, Rows, Wand, Settings } from 'lucide-react';
+import { Play, RefreshCw, Save, FolderOpen, Database, Calendar, Bot, Search, Plus, X, Star, Maximize, Minimize, Columns, Rows, Wand, Settings } from 'lucide-react';
 import { API_BASE } from '../config';
 import { useLayout } from '../contexts/LayoutContext';
 import SettingsModal from './SettingsModal';
@@ -16,7 +16,7 @@ const CATEGORY_TITLES = {
   'investigation': 'Investigation'
 };
 
-const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isChatOpen, onToggleChat, isSandbox, onAutoLayout }) => {
+const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isChatOpen, onToggleChat, isSandbox, onAutoLayout }) => {
   const { layoutDirection, toggleLayout } = useLayout();
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -511,7 +511,10 @@ const ToolPalette = ({ onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWork
           ref={fileInputRef} 
           onChange={onLoadWorkflow} 
         />
-        <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => fileInputRef.current?.click()} title="Load Workflow">
+        <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px', padding: '0 8px' }} onClick={onOpenController} title="Job Controller">
+            <Calendar size={16} style={{ color: '#818cf8' }} /> Controller
+          </button>
+          <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => fileInputRef.current?.click()} title="Load Workflow">
           <FolderOpen size={16} />
         </button>
         <button className="run-button" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={onSaveWorkflow} title="Save Workflow">

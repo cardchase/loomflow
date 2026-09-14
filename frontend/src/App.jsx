@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import dagre from 'dagre';
 import ToolPalette from './components/ToolPalette';
+import { ControllerDashboard } from './components/controller/ControllerModal';
 import Canvas from './components/Canvas';
 import ConfigWindow from './components/ConfigWindow';
 import ResultsWindow from './components/ResultsWindow';
@@ -343,6 +344,7 @@ function App({ isSandbox = false }) {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [selectedHandle, setSelectedHandle] = useState(null);
+  const [isControllerOpen, setIsControllerOpen] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -2345,6 +2347,7 @@ function App({ isSandbox = false }) {
         onRunPipeline={handleRunPipeline} 
         onStopPipeline={handleStopPipeline}
         onClearGlobalCache={handleClearGlobalCache}
+          onOpenController={() => setIsControllerOpen(true)}
         onSaveWorkflow={handleSaveWorkflow}
         onLoadWorkflow={handleLoadWorkflow}
         onExportYAML={handleExportYAML}
@@ -2364,19 +2367,28 @@ function App({ isSandbox = false }) {
       {/* Workspace Area */}
       <div id="workspace-container" className="workspace-container" style={{ position: 'relative' }}>
         <ErrorBoundary>
-          <ConfigWindow
-            selectedNode={selectedNode}
-            upstreamSchema={upstreamSchema}
-            onUpdateParams={handleUpdateParams}
-            availableTools={availableTools}
-            results={results}
-            nodes={nodes}
-            edges={edges}
-            setNodes={setNodes}
-            onCacheAndRun={handleCacheAndRun}
-            onClearGlobalCache={handleClearGlobalCache}
-            style={{ width: `${sidebarWidth}px` }}
-          />
+          {isControllerOpen ? (
+            <div style={{ width: `${sidebarWidth}px`, height: '100%', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-secondary)', flexShrink: 0 }}>
+              <ControllerDashboard 
+                currentWorkflowId={tabs.find(t => t.id === activeTabId)?.name} 
+                onClose={() => setIsControllerOpen(false)} 
+              />
+            </div>
+          ) : (
+            <ConfigWindow
+              selectedNode={selectedNode}
+              upstreamSchema={upstreamSchema}
+              onUpdateParams={handleUpdateParams}
+              availableTools={availableTools}
+              results={results}
+              nodes={nodes}
+              edges={edges}
+              setNodes={setNodes}
+              onCacheAndRun={handleCacheAndRun}
+              onClearGlobalCache={handleClearGlobalCache}
+              style={{ width: `${sidebarWidth}px` }}
+            />
+          )}
         </ErrorBoundary>
 
         <div className="sidebar-resizer" onMouseDown={startResizing} />
@@ -2451,6 +2463,7 @@ function App({ isSandbox = false }) {
                 onUpdateParams={handleUpdateParams}
                 onCacheAndRun={handleCacheAndRun}
                 onClearGlobalCache={handleClearGlobalCache}
+          onOpenController={() => setIsControllerOpen(true)}
                 onNodesDelete={onNodesDelete}
                 onEdgesDelete={onEdgesDelete}
                 onNodeDragStop={(e, node) => {
@@ -2556,6 +2569,7 @@ function App({ isSandbox = false }) {
         nodes={nodes} 
         edges={edges} 
       />
+      
     </div>
   );
 }
