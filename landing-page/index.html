@@ -1,64 +1,722 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loomflow | Visual Data Pipeline Automation</title>
-    <meta name="description" content="Loomflow is a self-hosted, lightweight alternative to enterprise ETL platforms. Visual drag-and-drop ETL data pipeline automation canvas.">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="icon" href="../frontend/public/assets/loomflow_icon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoomFlow — Visual Data Pipeline Automation | Locally Hosted. Polars Fast.</title>
+  <meta name="description" content="A self-hosted, lightweight visual ETL platform inspired by Alteryx. Build lightning-fast Polars data pipelines visually with Gemini AI and Python orchestration.">
+
+  <!-- Open Graph / Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://loomflow.dev/">
+  <meta property="og:title" content="LoomFlow — Visual Data Pipeline Automation">
+  <meta property="og:description" content="Visual data pipeline automation. Locally hosted, Polars fast. Built for engineers and analysts.">
+  <meta property="og:image" content="screenshot.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              navy: '#0B192C',
+              dark: '#1E3E62',
+              primary: '#0056B3',
+              accent: '#00B4D8',
+              cyan: '#00D2FF',
+              emerald: '#10B981',
+              card: '#0f2238'
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 35px -5px rgba(0, 210, 255, 0.25)',
+            'glow-blue': '0 0 40px -5px rgba(0, 86, 179, 0.35)',
+            'hero-window': '0 25px 60px -15px rgba(11, 25, 44, 0.25), 0 0 0 1px rgba(148, 163, 184, 0.2)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom subtle grid background */
+    .bg-grid-subtle {
+      background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
+    .bg-grid-dark {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
+    /* Smooth custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="logo">
-            <img src="../frontend/public/assets/loomflow_icon.svg" alt="Loomflow Logo" class="logo-img">
-            <span>Loomflow</span>
-        </div>
-        <div class="nav-links">
-            <a href="https://github.com/loomflow/loomflow" target="_blank" rel="noopener">GitHub</a>
-            <a href="https://loomflow.dev" class="btn">Get Started</a>
-        </div>
-    </nav>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased selection:bg-brand-cyan selection:text-brand-navy">
 
-    <main class="hero">
-        <div class="hero-content">
-            <h1>Weave Your Data <br> With <span>Loomflow</span></h1>
-            <p>A modern, visual data engineering platform co-created with AI. Drag, drop, and automate your entire ETL pipeline with lighting fast performance.</p>
-            <div class="cta-buttons">
-                <a href="https://github.com/loomflow/loomflow" class="btn primary">View on GitHub</a>
-                <a href="#features" class="btn secondary">Learn More</a>
-            </div>
-        </div>
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
         
-        <div class="hero-image">
-            <img src="../docs/screenshot_workflow.png" alt="Loomflow Canvas Editor">
-        </div>
-    </main>
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-navy via-brand-dark to-brand-primary flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6 text-brand-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12h5l3-7 4 14 3-7h5"/>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xl font-extrabold tracking-tight text-brand-navy">Loom<span class="text-brand-primary">Flow</span></span>
+            <span class="text-[9px] font-bold text-slate-400 -mt-1 tracking-widest uppercase">Visual Polars ETL</span>
+          </div>
+        </a>
 
-    <section id="features" class="features">
-        <h2>Enterprise-Grade Visual ETL</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🚀</div>
-                <h3>Lightning Fast</h3>
-                <p>Powered by Rust-based Polars for O(1) vectorization and in-memory execution.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3>Auto-Recover</h3>
-                <p>Zero data-loss auto-saving directly to your local browser cache.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">☁️</div>
-                <h3>Global Connectors</h3>
-                <p>Natively integrate with GCP, Postgres, SQLite, and more in seconds.</p>
-            </div>
-        </div>
-    </section>
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+          <a href="#features" class="hover:text-brand-primary transition-colors">Features</a>
+          <a href="#architecture" class="hover:text-brand-primary transition-colors">UI Tour</a>
+          <a href="#benchmarks" class="hover:text-brand-primary transition-colors">Benchmarks</a>
+          <a href="#pillars" class="hover:text-brand-primary transition-colors">Why LoomFlow</a>
+          <a href="#quickstart" class="hover:text-brand-primary transition-colors">Quickstart</a>
+        </nav>
 
-    <footer>
-        <p>&copy; 2026 Loomflow Community. Open Source.</p>
-    </footer>
+        <!-- Navbar Actions -->
+        <div class="flex items-center gap-3">
+          <a href="https://github.com/cardchase/loomflow" target="_blank" rel="noreferrer" 
+             class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 transition border border-slate-300/80 shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            <span>Star on GitHub</span>
+            <span class="bg-white text-slate-700 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border border-slate-200">★ Open Source</span>
+          </a>
+
+          <a href="#quickstart" class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-bold bg-brand-primary hover:bg-blue-700 text-white shadow-sm transition-all">
+            Run Local
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <section class="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100 border-b border-slate-200 bg-grid-subtle">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Headline & Subtitle -->
+      <div class="text-center max-w-4xl mx-auto mb-10">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/90 text-brand-primary text-xs font-semibold mb-6 shadow-sm">
+          <span class="flex h-2 w-2 rounded-full bg-brand-cyan animate-pulse"></span>
+          <span>Self-Hosted &bull; Free &bull; Open Source</span>
+          <span class="text-slate-300">|</span>
+          <span class="text-slate-700 font-normal">Alteryx simplicity with Polars multi-threaded speed</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-brand-navy tracking-tight leading-[1.14] mb-6">
+          Visual Data Pipeline Automation. <br class="hidden sm:inline"/>
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-primary via-blue-600 to-brand-cyan">
+            Locally Hosted. Polars Fast.
+          </span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto font-normal mb-8">
+          Build and execute complex Directed Acyclic Graphs (DAGs) locally. 
+          Experience <strong>sub-millisecond execution times</strong> with multi-threaded Polars DataFrames, 
+          seamless <strong>Gemini Multimodal AI</strong> orchestration, and an embedded <strong>Python IDE</strong>.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://github.com/cardchase/loomflow" target="_blank" rel="noreferrer" 
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-brand-navy hover:bg-brand-dark shadow-lg shadow-brand-navy/25 transition-all transform hover:-translate-y-0.5">
+            <svg class="w-5 h-5 text-brand-cyan" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>Get Started on GitHub</span>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono">v0.9.4</span>
+          </a>
+
+          <a href="#quickstart" 
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-sm transition-all">
+            <svg class="w-4 h-4 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Quickstart Guide</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="relative max-w-6xl mx-auto mt-8">
+        <!-- Glow Backing -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-brand-cyan via-brand-primary to-blue-600 rounded-2xl blur-lg opacity-30"></div>
+
+        <!-- Application Window Container -->
+        <div class="relative rounded-xl bg-slate-900 border border-slate-700/80 shadow-hero-window overflow-hidden">
+          
+          <!-- Browser Header Bar (macOS / Windows Hybrid Look) -->
+          <div class="bg-slate-800/95 px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              
+              <div class="ml-3 hidden sm:flex items-center text-xs font-mono text-slate-300 bg-slate-900/80 px-3.5 py-1 rounded-md border border-slate-700 gap-2 shadow-inner">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <span>http://127.0.0.1:5173/ — LoomFlow Visual Data Pipeline</span>
+              </div>
+            </div>
+
+            <!-- Inspect full image trigger -->
+            <div class="flex items-center gap-3">
+              <span class="hidden md:inline text-[11px] font-mono text-slate-400 bg-slate-700/60 px-2 py-0.5 rounded">Polars 30ms &bull; 90,021 Rows</span>
+              <button onclick="openImageModal()" class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-cyan hover:text-white bg-slate-700/80 hover:bg-slate-700 px-3 py-1 rounded transition border border-slate-600">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                <span>Zoom View</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- The Real Application Screenshot -->
+          <div class="relative group bg-slate-950 overflow-hidden cursor-pointer" onclick="openImageModal()">
+            <img 
+              id="heroScreenshot"
+              src="screenshot.png" 
+              alt="LoomFlow Visual Data Pipeline Workspace showing Select panel, DAG canvas with dynamic input, union, filter, tool containers, and data preview" 
+              class="w-full h-auto block object-cover transform transition duration-500 group-hover:scale-[1.01]"
+              onerror="this.onerror=null; this.src='https://placehold.co/1280x720/0B192C/00D2FF?text=Place+screenshot.png+in+root+directory'; document.getElementById('screenshotWarning').classList.remove('hidden');"
+            />
+
+            <!-- Hover overlay indicator -->
+            <div class="absolute inset-0 bg-brand-navy/10 group-hover:bg-transparent transition flex items-center justify-center pointer-events-none">
+              <div class="opacity-0 group-hover:opacity-100 transition duration-300 bg-slate-900/90 text-brand-cyan border border-brand-cyan/40 px-4 py-2 rounded-full text-xs font-semibold shadow-xl backdrop-blur-sm">
+                Click to expand high-resolution UI preview
+              </div>
+            </div>
+          </div>
+
+          <!-- Screenshot Fallback Helper Message (only displays if image file is not found) -->
+          <div id="screenshotWarning" class="hidden bg-amber-500/10 border-t border-amber-500/30 p-3 text-center text-xs text-amber-300">
+            <strong>Note:</strong> Make sure your file is saved as <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-200">screenshot.png</code> in the repository root beside <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-200">index.html</code> so it renders directly here.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="py-8 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-xs uppercase tracking-widest text-slate-400 font-semibold mb-6">
+        Architected with High-Performance Open Source Foundations
+      </p>
+      
+      <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-slate-600 font-semibold text-sm">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⚡</span>
+          <span class="text-slate-800">Polars</span>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">Rust Engine</span>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⚛️</span>
+          <span class="text-slate-800">React Flow</span>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">Canvas DAG</span>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🚀</span>
+          <span class="text-slate-800">FastAPI</span>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">Async Python</span>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">✨</span>
+          <span class="text-slate-800">Gemini AI</span>
+          <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-mono">Multimodal</span>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📦</span>
+          <span class="text-slate-800">Apache Parquet</span>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">Fast Caching</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="architecture" class="py-20 bg-[#F8FAFC]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2">Interface Architecture</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-brand-navy tracking-tight">
+          Modeled for Analysts. Built for Engineers.
+        </p>
+        <p class="text-slate-600 mt-4 text-base">
+          LoomFlow translates enterprise Alteryx workflows into modern open-source software, pairing visual clarity with high-speed execution.
+        </p>
+      </div>
+
+      <!-- Feature Grid matching the screenshot sections -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Left Panel: Select & Field Schema -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-brand-navy mb-2">Column Cast & Rename Inspector</h3>
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Inspect column lineage in real-time. Dynamically cast strings to dates, rename headers, and prune unnecessary fields before feeding into heavy downstream calculations.
+          </p>
+          <span class="text-[11px] font-mono text-brand-primary bg-blue-50 px-2 py-1 rounded">Select [Node 3]</span>
+        </div>
+
+        <!-- Top Palette: Categorized Tool Ribbons -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-brand-navy mb-2">Extensive Tool Ribbon</h3>
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Alteryx-style tool categories: <strong>Favorites, In/Out, Preparation, Transform, Join</strong>, and <strong>Reporting</strong>. Drag Dynamic Inputs, Formulas, and Filters straight onto the canvas.
+          </p>
+          <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-1 rounded">+ Add Tool / Shortcuts</span>
+        </div>
+
+        <!-- Canvas DAG: Interactive Node Graph -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-brand-navy mb-2">Multi-Stream DAG & Containers</h3>
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Group related operational branches inside <strong>Tool Containers</strong>. Seamlessly union parallel streams, apply complex multi-rule filters, and deduplicate with Unique nodes.
+          </p>
+          <span class="text-[11px] font-mono text-amber-700 bg-amber-50 px-2 py-1 rounded">Tool Container [26, 27]</span>
+        </div>
+
+        <!-- Bottom Panel: Data Preview & Execution Logs -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-brand-navy mb-2">Instant Data Preview & Logs</h3>
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Click any node to immediately view cached row profiles and schema types. Inspect 90,000+ rows in 30ms, copy tables to clipboard, or export direct to Parquet/CSV.
+          </p>
+          <span class="text-[11px] font-mono text-purple-700 bg-purple-50 px-2 py-1 rounded">Load 90,021 Rows</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section id="benchmarks" class="py-20 bg-white border-t border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <div class="lg:col-span-5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mb-3">
+            Multi-Threaded Vectorized Execution
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-navy tracking-tight leading-tight">
+            Stop Waiting on Legacy Pandas Workflows.
+          </h2>
+          <p class="text-slate-600 mt-4 text-sm leading-relaxed">
+            Standard Python ETL suites choke on memory limits and single-core bottlenecks. LoomFlow is built natively on Polars and Rust execution cores to ensure your workstation remains responsive even when crunching millions of rows.
+          </p>
+
+          <div class="mt-6 space-y-3 font-mono text-xs">
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-500 font-bold">✓</span>
+              <span>Vectorized query optimization with Apache Arrow</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-500 font-bold">✓</span>
+              <span>Sub-millisecond branch pruning & disk caching</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-500 font-bold">✓</span>
+              <span>Auto-recovery with zero data loss</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7">
+          <div class="bg-slate-900 rounded-2xl p-6 sm:p-8 text-white border border-slate-800 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+              <span class="text-xs font-mono text-slate-400">BENCHMARK: 1M ROWS FILTER, JOIN & GROUP BY</span>
+              <span class="text-xs font-mono text-brand-cyan">Faster is better</span>
+            </div>
+
+            <!-- Polars Bar -->
+            <div class="mb-6">
+              <div class="flex justify-between text-xs font-semibold mb-1.5">
+                <span class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-brand-cyan"></span>
+                  <span>LoomFlow (Polars Engine)</span>
+                </span>
+                <span class="font-mono text-brand-cyan">0.032s (32ms)</span>
+              </div>
+              <div class="w-full bg-slate-800 h-6 rounded-lg overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-blue-500 to-brand-cyan h-full rounded w-[8%] transition-all duration-1000"></div>
+              </div>
+            </div>
+
+            <!-- Pandas Bar -->
+            <div class="mb-4">
+              <div class="flex justify-between text-xs font-semibold mb-1.5">
+                <span class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                  <span>Standard Python (Pandas)</span>
+                </span>
+                <span class="font-mono text-slate-400">1.840s (1,840ms)</span>
+              </div>
+              <div class="w-full bg-slate-800 h-6 rounded-lg overflow-hidden p-0.5">
+                <div class="bg-slate-600 h-full rounded w-[85%]"></div>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 text-right mt-4 font-mono">
+              Up to <span class="text-emerald-400 font-bold">57x faster</span> execution on identical hardware.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section id="pillars" class="py-20 bg-[#F8FAFC]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2">Architectural Principles</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-brand-navy tracking-tight">
+          The Four Pillars of Data Pipeline Confidence
+        </p>
+        <p class="text-slate-600 mt-4 text-base">
+          Inspired by the proven governance principles of Alteryx ("VURA"), reimagined for modern open-source stacks.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Visible -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm hover:border-brand-primary/40 hover:shadow-glow-cyan transition">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-primary flex items-center justify-center font-bold text-xl mb-5">
+            👁️
+          </div>
+          <h3 class="text-lg font-bold text-brand-navy mb-2">Visible</h3>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Eliminate invisible Python script errors. Build explicit visual DAGs where upstream and downstream column lineage is traceable at every point.
+          </p>
+        </div>
+
+        <!-- Understandable -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm hover:border-brand-primary/40 hover:shadow-glow-cyan transition">
+          <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-xl mb-5">
+            🧩
+          </div>
+          <h3 class="text-lg font-bold text-brand-navy mb-2">Understandable</h3>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Self-documenting workflows allow analysts, data scientists, and business stakeholders to visually understand exact business logic at a glance.
+          </p>
+        </div>
+
+        <!-- Repeatable -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm hover:border-brand-primary/40 hover:shadow-glow-cyan transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl mb-5">
+            🔁
+          </div>
+          <h3 class="text-lg font-bold text-brand-navy mb-2">Repeatable</h3>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Deterministic execution powered by in-memory Polars. Run the exact same pipeline locally across millions of records without environment drift.
+          </p>
+        </div>
+
+        <!-- Auditable -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm hover:border-brand-primary/40 hover:shadow-glow-cyan transition">
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xl mb-5">
+            🛡️
+          </div>
+          <h3 class="text-lg font-bold text-brand-navy mb-2">Auditable</h3>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Per-node row throughput counters, automated type inference logs, and intermediate Parquet snapshots provide full governance on your own PC.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section id="quickstart" class="py-20 bg-brand-navy text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-grid-dark opacity-30"></div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-brand-cyan">Developer Quickstart</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mt-2 text-white">
+          Up and Running in 60 Seconds
+        </h2>
+        <p class="text-slate-300 mt-3 text-sm">
+          Run LoomFlow completely locally. Single script execution resolves virtual environments and dependencies automatically.
+        </p>
+      </div>
+
+      <!-- Terminal Box -->
+      <div class="rounded-xl bg-[#09111c] border border-slate-700 shadow-2xl overflow-hidden font-mono text-xs sm:text-sm">
+        
+        <!-- Terminal Header with Tabs -->
+        <div class="bg-[#0f1d2e] px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+            <span class="ml-2 text-xs text-slate-400">bash / powershell</span>
+          </div>
+
+          <!-- OS Selector -->
+          <div class="flex items-center gap-2">
+            <button id="btnWindows" onclick="switchOsTab('windows')" class="px-2.5 py-1 rounded text-xs font-semibold bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40">
+              Windows (PowerShell)
+            </button>
+            <button id="btnUnix" onclick="switchOsTab('unix')" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200">
+              macOS / Linux (Bash)
+            </button>
+          </div>
+        </div>
+
+        <!-- Terminal Body -->
+        <div class="p-6 relative">
+          
+          <!-- Copy to Clipboard Button -->
+          <button onclick="copySnippet()" class="absolute top-4 right-4 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition text-xs font-sans">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            <span id="copyText">Copy Commands</span>
+          </button>
+
+          <!-- Windows Code Block -->
+          <div id="codeWindows" class="block space-y-2 text-slate-200">
+            <p class="text-slate-500"># 1. Clone the repository</p>
+            <p><span class="text-brand-cyan">git</span> clone https://github.com/cardchase/loomflow.git</p>
+            <p><span class="text-brand-cyan">cd</span> loomflow</p>
+            <p class="text-slate-500 pt-2"># 2. Run the automated setup script</p>
+            <p><span class="text-emerald-400">.\run.ps1</span></p>
+            <p class="text-slate-500 pt-2"># 3. Open your browser</p>
+            <p class="text-amber-300">&rarr; http://localhost:5173</p>
+          </div>
+
+          <!-- Unix Code Block -->
+          <div id="codeUnix" class="hidden space-y-2 text-slate-200">
+            <p class="text-slate-500"># 1. Clone the repository</p>
+            <p><span class="text-brand-cyan">git</span> clone https://github.com/cardchase/loomflow.git</p>
+            <p><span class="text-brand-cyan">cd</span> loomflow</p>
+            <p class="text-slate-500 pt-2"># 2. Make script executable and run</p>
+            <p><span class="text-emerald-400">chmod</span> +x run.sh && ./run.sh</p>
+            <p class="text-slate-500 pt-2"># 3. Open your browser</p>
+            <p class="text-amber-300">&rarr; http://localhost:5173</p>
+          </div>
+
+        </div>
+
+        <div class="bg-[#0b1624] px-6 py-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Prerequisites: Python 3.10+ & Node.js 18+</span>
+          <span class="text-brand-cyan">Automatic venv + dependency resolution</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="bg-gradient-to-r from-blue-600 via-brand-primary to-brand-cyan rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+        
+        <div class="max-w-xl text-center md:text-left">
+          <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold mb-3">
+            <span>🚀 Product Hunt Launch Ready</span>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Support LoomFlow on GitHub</h3>
+          <p class="text-blue-100 text-xs sm:text-sm mt-2 leading-relaxed">
+            LoomFlow is open source and community driven. Star the repository, report issues, and help us build the premier local-first alternative to proprietary ETL.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <a href="https://github.com/cardchase/loomflow" target="_blank" rel="noreferrer"
+             class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-white text-brand-navy hover:bg-slate-100 font-bold text-sm shadow-md transition transform hover:scale-105">
+            ⭐ Star on GitHub
+          </a>
+          <a href="https://github.com/cardchase/loomflow/issues" target="_blank" rel="noreferrer"
+             class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-blue-900/50 hover:bg-blue-900/80 text-white font-semibold text-sm border border-blue-400/40 transition">
+            Request Feature
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="bg-slate-900 text-slate-400 py-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded bg-brand-primary flex items-center justify-center text-white font-bold">
+          LF
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-white text-sm">LoomFlow</span>
+          <span>Locally Hosted Visual Polars ETL</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6">
+        <a href="https://github.com/cardchase/loomflow" class="hover:text-white transition">Repository</a>
+        <a href="https://github.com/cardchase/loomflow/blob/main/LICENSE" class="hover:text-white transition">MIT License</a>
+        <a href="https://github.com/cardchase/loomflow/issues" class="hover:text-white transition">Community Issues</a>
+      </div>
+
+      <div class="text-slate-500">
+        &copy; 2026 LoomFlow. Built with Polars, React & FastAPI.
+      </div>
+
+    </div>
+  </footer>
+
+  <div id="imageModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="relative max-w-7xl w-full max-h-[92vh] flex flex-col bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-2xl">
+      <div class="p-3 bg-slate-800 border-b border-slate-700 flex justify-between items-center text-xs text-white">
+        <span class="font-mono text-brand-cyan font-bold">LoomFlow v0.9.4 — High Resolution Workflow View</span>
+        <button onclick="closeImageModal()" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-200 transition">
+          ✕ Close [Esc]
+        </button>
+      </div>
+      <div class="p-2 overflow-auto flex items-center justify-center">
+        <img src="screenshot.png" alt="Full Screen Screenshot" class="max-w-full max-h-[82vh] object-contain rounded" onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0B192C/00D2FF?text=Screenshot+Not+Found';">
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Message -->
+  <div id="toastMessage" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-medium border border-slate-700 transition-all opacity-0 pointer-events-none transform translate-y-2 z-50 flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toastText">Copied to clipboard!</span>
+  </div>
+
+  <script>
+    // Tab switching for OS terminal block
+    function switchOsTab(os) {
+      const btnWin = document.getElementById('btnWindows');
+      const btnUnix = document.getElementById('btnUnix');
+      const codeWin = document.getElementById('codeWindows');
+      const codeUnix = document.getElementById('codeUnix');
+
+      if (os === 'windows') {
+        btnWin.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40';
+        btnUnix.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200';
+        codeWin.classList.remove('hidden');
+        codeUnix.classList.add('hidden');
+      } else {
+        btnUnix.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40';
+        btnWin.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200';
+        codeUnix.classList.remove('hidden');
+        codeWin.classList.add('hidden');
+      }
+    }
+
+    // Modal view handlers for high-res screenshot
+    function openImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeImageModal();
+      }
+    });
+
+    // Copy script using robust execCommand fallback for iFrame compatibility
+    function copySnippet() {
+      const isWindows = !document.getElementById('codeWindows').classList.contains('hidden');
+      const textToCopy = isWindows 
+        ? "git clone https://github.com/cardchase/loomflow.git\ncd loomflow\n.\\run.ps1"
+        : "git clone https://github.com/cardchase/loomflow.git\ncd loomflow\nchmod +x run.sh && ./run.sh";
+
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = textToCopy;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showToast("Quickstart commands copied to clipboard!");
+      } catch (err) {
+        console.error("Copy failed", err);
+      }
+      document.body.removeChild(tempTextArea);
+    }
+
+    // Toast Notification helper
+    function showToast(msg) {
+      const toast = document.getElementById('toastMessage');
+      const toastText = document.getElementById('toastText');
+      toastText.innerText = msg;
+      
+      toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
