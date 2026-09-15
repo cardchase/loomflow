@@ -151,32 +151,8 @@ const CanvasContent = ({
 
   useEffect(() => {
     const handleFitView = () => {
-      // 1. Fit the view to get optimal zoom to fit the entire workflow
-      fitView({ padding: 0.1, maxZoom: 1.0, minZoom: 0.05, duration: 0 });
-      
-      // 2. Adjust it immediately to be left-aligned
-      setTimeout(() => {
-        const { x, y, zoom } = getViewport();
-        const nodesList = getNodes();
-        if (nodesList.length === 0) return;
-        
-        let minX = Infinity;
-        nodesList.forEach(n => {
-          if (n.position.x < minX) minX = n.position.x;
-        });
-        
-        // Use the optimal zoom calculated by fitView (capped at 1.0)
-        const newZoom = zoom;
-        
-        // 96px is approximately 1 inch. Calculate X so the leftmost node is at 96px.
-        // screenX = nodeFlowX * zoom + viewportX  =>  96 = minX * newZoom + newX
-        const newX = 96 - minX * newZoom;
-        
-        setViewport({ x: newX, y, zoom: newZoom }, { duration: 0 });
-        if (onMoveEnd) {
-          onMoveEnd(null, { x: newX, y, zoom: newZoom });
-        }
-      }, 50);
+      // Fit the view to get optimal zoom to fit the entire workflow, centered
+      fitView({ padding: 0.1, maxZoom: 1.0, minZoom: 0.05, duration: 200 });
     };
     window.addEventListener('loomflow-fit-view', handleFitView);
     return () => window.removeEventListener('loomflow-fit-view', handleFitView);
@@ -472,10 +448,12 @@ const CanvasContent = ({
                   // Calculate bounding box
                   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                   selectedNodes.forEach(n => {
+                    const w = n.measured?.width || n.width || 250;
+                    const h = n.measured?.height || n.height || 100;
                     if (n.position.x < minX) minX = n.position.x;
                     if (n.position.y < minY) minY = n.position.y;
-                    if (n.position.x + (n.width || 150) > maxX) maxX = n.position.x + (n.width || 150);
-                    if (n.position.y + (n.height || 60) > maxY) maxY = n.position.y + (n.height || 60);
+                    if (n.position.x + w > maxX) maxX = n.position.x + w;
+                    if (n.position.y + h > maxY) maxY = n.position.y + h;
                   });
 
                 // Add padding
