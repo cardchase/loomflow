@@ -11,6 +11,7 @@ import CustomNode from './components/CustomNode';
 import CommentNode from './components/CommentNode';
 import ContainerNode from './components/ContainerNode';
 import ChatPanel from './components/ChatPanel';
+import SynthesizerDrawer from './components/SynthesizerDrawer';
 import './App.css';
 
 // Ensure a unique session ID exists for this specific browser tab.
@@ -347,6 +348,7 @@ function App({ isSandbox = false }) {
   const [isControllerOpen, setIsControllerOpen] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isSynthesizerOpen, setIsSynthesizerOpen] = useState(false);
 
   // Tab-Canvas Synchronization Hook
   useEffect(() => {
@@ -2360,6 +2362,8 @@ function App({ isSandbox = false }) {
         onCacheAndRun={handleCacheAndRun}
         isChatOpen={isChatOpen}
         onToggleChat={() => setIsChatOpen(!isChatOpen)}
+        isSynthesizerOpen={isSynthesizerOpen}
+        onToggleSynthesizer={() => setIsSynthesizerOpen(!isSynthesizerOpen)}
         isSandbox={isSandbox}
         onAutoLayout={handleAutoLayout}
       />
@@ -2490,6 +2494,21 @@ function App({ isSandbox = false }) {
             />
           </ErrorBoundary>
         </div>
+        
+        <ChatPanel 
+          isOpen={isChatOpen} 
+          onClose={() => setIsChatOpen(false)} 
+          nodes={nodes} 
+          edges={edges} 
+        />
+        
+        <SynthesizerDrawer
+          isOpen={isSynthesizerOpen}
+          onClose={() => setIsSynthesizerOpen(false)}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          sessionId={activeTabId}
+        />
       </div>
 
       {/* Backend Disconnected Elegant Overlay */}
@@ -2562,14 +2581,6 @@ function App({ isSandbox = false }) {
           `}</style>
         </div>
       )}
-      
-      <ChatPanel 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
-        nodes={nodes} 
-        edges={edges} 
-      />
-      
     </div>
   );
 }

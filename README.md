@@ -1,3 +1,7 @@
+> [!WARNING]
+> ⚠️ **EXPERIMENTAL ALPHA BRANCH** ⚠️
+> This is a highly experimental, messy branch! We've made a mess building new tools and testing things out. Please don't expect anything here to be stable or professional.
+
 <div align="center">
   <img src="frontend/public/assets/loomflow_icon.svg" width="80" alt="Loomflow Logo">
   
