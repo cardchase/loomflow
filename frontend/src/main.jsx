@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import 'katex/dist/katex.min.css';
 import { LayoutProvider } from './contexts/LayoutContext'
 import { SettingsProvider } from './contexts/SettingsContext'
 

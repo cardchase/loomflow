@@ -38,6 +38,9 @@ from app.tools.transpose import TransposeNode
 
 # Newly added tools
 from app.tools.data_profiler import DataProfilerNode
+from app.tools.crm import CRMConnectorNode, TextClassificationNode, SLATimerNode, RuleRouterNode, ActionWebhookNode
+from app.tools.symbolic_math import SymbolicFormulaNode
+from app.tools.predictive import WindowFeaturesNode, OutlierTreatmentNode, MLPredictorNode
 
 NODE_CLASSES = {
     "fileInput": FileInputNode,
@@ -78,4 +81,13 @@ NODE_CLASSES = {
     
     # New additions
     "data_profiler": DataProfilerNode,
+    "crmConnector": CRMConnectorNode,
+    "textClassification": TextClassificationNode,
+    "slaTimer": SLATimerNode,
+    "ruleRouter": RuleRouterNode,
+    "actionWebhook": ActionWebhookNode,
+    "symbolicFormula": SymbolicFormulaNode,
+    "windowFeatures": WindowFeaturesNode,
+    "outlierTreatment": OutlierTreatmentNode,
+    "mlPredictor": MLPredictorNode,
 }

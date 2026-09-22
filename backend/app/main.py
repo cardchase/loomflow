@@ -24,6 +24,7 @@ load_dotenv()
 from app.engine import execute_pipeline
 from app.cache import cache_manager
 from app.routers.controller import router as controller_router
+from app.routers.agent_router import router as agent_router
 from app.controller.service import controller
 
 from app.tools.file_input import FileInputNode
@@ -32,6 +33,7 @@ from app.tools import NODE_CLASSES
 app = FastAPI(title="Loomflow - Self-hosted Alteryx Engine")
 
 app.include_router(controller_router)
+app.include_router(agent_router)
 
 @app.on_event("startup")
 def on_startup():

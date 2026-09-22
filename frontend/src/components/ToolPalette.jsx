@@ -16,7 +16,7 @@ const CATEGORY_TITLES = {
   'investigation': 'Investigation'
 };
 
-const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isChatOpen, onToggleChat, isSandbox, onAutoLayout }) => {
+const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isChatOpen, onToggleChat, isSynthesizerOpen, onToggleSynthesizer, isSandbox, onAutoLayout }) => {
   const { layoutDirection, toggleLayout } = useLayout();
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -559,6 +559,20 @@ const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWo
           title="Toggle AI Assistant"
         >
           <span style={{ fontSize: '12px' }}>✨</span>
+        </button>
+        <button 
+          className="run-button" 
+          style={{ 
+            background: isSynthesizerOpen ? '#ede9fe' : 'var(--bg-secondary)', 
+            color: isSynthesizerOpen ? '#7c3aed' : 'var(--text-primary)', 
+            border: `1px solid ${isSynthesizerOpen ? '#c4b5fd' : 'var(--border-color)'}`,
+            fontWeight: 600,
+            marginLeft: '4px'
+          }} 
+          onClick={onToggleSynthesizer} 
+          title="Toggle Workflow Synthesizer"
+        >
+          <Icons.Wand2 size={16} />
         </button>
 
         <div className="divider-vertical" style={{ height: '24px', width: '1px', background: 'var(--border-color)', margin: '0 4px' }} />
