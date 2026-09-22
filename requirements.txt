@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+polars
+python-dotenv
+openai
+google-genai
+sympy
+pydantic
+xgboost
+scikit-learn
+pdfplumber
+pandas
