@@ -1857,31 +1857,53 @@ const ConfigWindow = ({ selectedNode, upstreamSchema, onUpdateParams, availableT
                   {expandedFormulas[idx] !== false && (
                     <>
                   
-                  <div className="form-group" style={{ marginBottom: 0, cursor: 'default' }}>
-                    <label className="form-label" style={{ fontSize: '0.7rem' }}>Target Column (Existing or New)</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      {hasUpstreamColumns && (
-                        <SafeSelect 
-                          value={upstreamSchema.find(c => c.name === f.output_column) ? f.output_column : ''} 
-                          onChange={(e) => {
-                            if (e.target.value) handleFormulaChange(idx, 'output_column', e.target.value);
-                          }}
-                          style={{ flex: 1, boxSizing: 'border-box', cursor: 'pointer' }}
-                        >
-                          <option value="">-- Select Existing Column --</option>
-                          {upstreamSchema.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                        </SafeSelect>
-                      )}
-                      <SafeInput
-                        type="text"
-                        placeholder="Or type column name..."
-                        value={f.output_column || ''}
-                        onChange={(e) => handleFormulaChange(idx, 'output_column', e.target.value)}
-                        style={{ flex: 1, boxSizing: 'border-box' }}
-                        onMouseDown={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  </div>
+                  {(() => {
+                    const currentVal = f.newColumn ?? f.outputColumn ?? f.output_column ?? f.column ?? '';
+                    const isExisting = hasUpstreamColumns && upstreamSchema.some(c => c.name === currentVal);
+                    
+                    return (
+                      <div className="form-group" style={{ marginBottom: 0, cursor: 'default' }}>
+                        <label className="form-label" style={{ fontSize: '0.7rem' }}>Target Column</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {hasUpstreamColumns && (
+                            <SafeSelect 
+                              value={isExisting ? currentVal : '__NEW_COLUMN__'} 
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const newFormulas = [...currentFormulas];
+                                if (val === '__NEW_COLUMN__') {
+                                   newFormulas[idx] = { ...newFormulas[idx], output_column: '', column: '', newColumn: '', isNew: true };
+                                } else {
+                                   newFormulas[idx] = { ...newFormulas[idx], output_column: val, column: val, newColumn: val, isNew: false };
+                                }
+                                onUpdateParams(id, { ...parameters, formulas: newFormulas });
+                              }}
+                              style={{ width: '100%', boxSizing: 'border-box', cursor: 'pointer' }}
+                            >
+                              <option value="__NEW_COLUMN__">+ Add New Column</option>
+                              {upstreamSchema.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                            </SafeSelect>
+                          )}
+                          
+                          {(!isExisting) && (
+                            <SafeInput
+                              type="text"
+                              placeholder="Type new column name..."
+                              value={currentVal}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const newFormulas = [...currentFormulas];
+                                newFormulas[idx] = { ...newFormulas[idx], output_column: val, column: val, newColumn: val, isNew: true };
+                                onUpdateParams(id, { ...parameters, formulas: newFormulas });
+                              }}
+                              style={{ width: '100%', boxSizing: 'border-box' }}
+                              onMouseDown={(e) => e.stopPropagation()}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="form-group" style={{ marginBottom: 0, cursor: 'default', marginTop: '12px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>

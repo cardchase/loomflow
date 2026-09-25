@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { Terminal, Database, FileText, Copy, Check } from 'lucide-react';
+import { Terminal, Database, FileText, Copy, Check, ChevronUp, ChevronDown } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -7,7 +7,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { API_BASE } from '../config';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, activeTabId, style = {} }) => {
+const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, activeTabId, isMinimized, onToggleMinimize, style = {} }) => {
   const [activeTab, setActiveTab] = useState('data'); // 'logs' or 'data'
   const [selectedPort, setSelectedPort] = useState(null);
   const [prevNodeId, setPrevNodeId] = useState(null);
@@ -211,8 +211,22 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
     <div className="results-window" style={style}>
       {/* Header and Tabs */}
       <div className="results-header">
-        <div className="results-tabs">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button 
+            onClick={onToggleMinimize} 
+            title={isMinimized ? "Expand Panel" : "Minimize Panel"}
+            style={{ 
+              background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', 
+              color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', borderRadius: '4px' 
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            {isMinimized ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          <div className="results-tabs">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
             <button
               className={`results-tab ${activeTab === 'data' ? 'active' : ''}`}
               onClick={() => setActiveTab('data')}
@@ -247,6 +261,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
             <Terminal size={14} />
             <span>Execution Logs</span>
           </button>
+        </div>
         </div>
 
         {/* Multi-port Selector */}
@@ -303,6 +318,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
       </div>
 
       {/* Pane Content */}
+      {!isMinimized && (
       <div className="results-content">
         {activeTab === 'data' && (
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
@@ -627,6 +643,7 @@ const ResultsWindow = ({ selectedNode, originalNode, results, globalLogs, active
           </div>
         )}
       </div>
+      )}
 
       {previewImage && (
         <div style={{

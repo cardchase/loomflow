@@ -24,6 +24,7 @@ load_dotenv()
 from app.engine import execute_pipeline
 from app.cache import cache_manager
 from app.routers.controller import router as controller_router
+from app.routers.agent_router import router as agent_router
 from app.controller.service import controller
 
 from app.tools.file_input import FileInputNode
@@ -32,6 +33,7 @@ from app.tools import NODE_CLASSES
 app = FastAPI(title="Loomflow - Self-hosted Alteryx Engine")
 
 app.include_router(controller_router)
+app.include_router(agent_router)
 
 @app.on_event("startup")
 def on_startup():
@@ -677,44 +679,7 @@ def on_shutdown():
 # --- AI Assistant Endpoint ---
 from pydantic import BaseModel
 
-class ChatRequest(BaseModel):
-    message: str
-    nodes: List[Dict[str, Any]]
-    edges: List[Dict[str, Any]]
 
-@app.post("/api/chat")
-async def chat_assistant(req: ChatRequest):
-    """
-    Integrates with Gemini via google-genai to provide AI assistance
-    for pipeline building and troubleshooting.
-    """
-    try:
-        from google import genai
-        api_key = os.environ.get("GOOGLE_API_KEY")
-        if not api_key:
-            return {"response": "I cannot answer because the GOOGLE_API_KEY environment variable is not set."}
-        
-        client = genai.Client(api_key=api_key)
-        
-        # Prepare context
-        context = f"The user is asking about their ETL pipeline. Here is the current graph:\nNodes: {len(req.nodes)}\nEdges: {len(req.edges)}\n"
-        if len(req.nodes) > 0:
-            node_summaries = []
-            for n in req.nodes:
-                name = n.get("data", {}).get("label", n.get("type", "Node"))
-                node_summaries.append(f"- {name} (ID: {n.get('id')})")
-            context += "Node List:\n" + "\n".join(node_summaries) + "\n"
-
-        prompt = f"{context}\n\nUser Message: {req.message}"
-        
-        response = client.models.generate_content(
-            model='gemini-2.5-pro',
-            contents=prompt,
-        )
-        
-        return {"response": response.text}
-    except Exception as e:
-        return {"response": f"AI Error: {str(e)}"}
 
 from pydantic import BaseModel
 class ErrorLog(BaseModel):
