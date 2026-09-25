@@ -103,7 +103,8 @@ Loomflow features a highly advanced, fully integrated **Autonomous AI Pipeline S
 
 ### Using Local Models (LM Studio & Qwen)
 We strongly support privacy-first, fully local setups! Currently, our recommended configuration utilizes **LM Studio** running uncensored or advanced instruction-tuned models. 
-* **Tested & Recommended Model:** `Qwen 2.5 Pro` (or similar high-capability Qwen variants).
+* **Tested & Recommended Model:** `empero-ai/Qwen3.8-2B-Distill-GGUF` (specifically the `Qwen3.8-2B-Q5_K_M.gguf` quantization). 
+  > *Note: Our orchestration logic is highly optimized so that even very small ~2B parameter models can succeed. Larger models will naturally perform even better!*
 * **Setup:**
   1. Boot up LM Studio.
   2. Download your preferred `Qwen` GGUF model.
