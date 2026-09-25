@@ -16,7 +16,7 @@ const CATEGORY_TITLES = {
   'investigation': 'Investigation'
 };
 
-const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isChatOpen, onToggleChat, isSandbox, onAutoLayout }) => {
+const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWorkflow, onLoadWorkflow, onExportYAML, onClearGlobalCache, isRunning, autoRun, setAutoRun, availableTools = [], selectedNode, onUpdateParams, onCacheAndRun, onAddNode, isSynthesizerOpen, onToggleSynthesizer, isSandbox, onAutoLayout }) => {
   const { layoutDirection, toggleLayout } = useLayout();
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -550,13 +550,13 @@ const ToolPalette = ({ onOpenController, onRunPipeline, onStopPipeline, onSaveWo
         <button 
           className="run-button" 
           style={{ 
-            background: isChatOpen ? '#ede9fe' : 'var(--bg-secondary)', 
-            color: isChatOpen ? '#7c3aed' : 'var(--text-primary)', 
-            border: `1px solid ${isChatOpen ? '#c4b5fd' : 'var(--border-color)'}`,
+            background: isSynthesizerOpen ? '#ede9fe' : 'var(--bg-secondary)', 
+            color: isSynthesizerOpen ? '#7c3aed' : 'var(--text-primary)', 
+            border: `1px solid ${isSynthesizerOpen ? '#c4b5fd' : 'var(--border-color)'}`,
             fontWeight: 600
           }} 
-          onClick={onToggleChat} 
-          title="Toggle AI Assistant"
+          onClick={onToggleSynthesizer} 
+          title="Toggle AI Workspace"
         >
           <span style={{ fontSize: '12px' }}>✨</span>
         </button>

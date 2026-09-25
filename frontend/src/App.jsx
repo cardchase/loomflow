@@ -10,7 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import CustomNode from './components/CustomNode';
 import CommentNode from './components/CommentNode';
 import ContainerNode from './components/ContainerNode';
-import ChatPanel from './components/ChatPanel';
+import SynthesizerDrawer from './components/SynthesizerDrawer';
 import './App.css';
 
 // Ensure a unique session ID exists for this specific browser tab.
@@ -346,7 +346,7 @@ function App({ isSandbox = false }) {
   const [selectedHandle, setSelectedHandle] = useState(null);
   const [isControllerOpen, setIsControllerOpen] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState(true);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isSynthesizerOpen, setIsSynthesizerOpen] = useState(false);
 
   // Tab-Canvas Synchronization Hook
   useEffect(() => {
@@ -963,6 +963,18 @@ function App({ isSandbox = false }) {
     });
   }, [activeTabId, nodes, edges, results, globalLogs, isDirty]);
 
+  const handleLoadToNewCanvas = useCallback((newNodes, newEdges) => {
+    setTabs(prev => {
+      const currentSaved = prev.map(t => t.id === activeTabId ? { ...t, nodes, edges, results, globalLogs, isDirty, viewport: currentViewportRef.current } : t);
+      const newTabId = `tab-${Date.now()}`;
+      const existingNames = currentSaved.map(t => t.name);
+      const uniqueName = getUniqueTabName(`AI Workflow ${currentSaved.length + 1}`, existingNames);
+      const newTab = { id: newTabId, name: uniqueName, nodes: newNodes, edges: newEdges, results: {}, globalLogs: [], isDirty: true, viewport: { x: 50, y: 50, zoom: 1.0 } };
+      setActiveTabId(newTabId);
+      return [...currentSaved, newTab];
+    });
+  }, [activeTabId, nodes, edges, results, globalLogs, isDirty]);
+
   const handleCloseTab = useCallback((idToClose) => {
     setTabs(prev => {
       const newTabs = prev.filter(t => t.id !== idToClose);
@@ -1240,6 +1252,7 @@ function App({ isSandbox = false }) {
   }, []);
 
   const [resultsHeight, setResultsHeight] = useState(280);
+  const [isResultsMinimized, setIsResultsMinimized] = useState(false);
   const isResizingResults = React.useRef(false);
 
   const startResizingResults = useCallback((mouseDownEvent) => {
@@ -2358,8 +2371,8 @@ function App({ isSandbox = false }) {
         selectedNode={selectedNode}
         onUpdateParams={handleUpdateParams}
         onCacheAndRun={handleCacheAndRun}
-        isChatOpen={isChatOpen}
-        onToggleChat={() => setIsChatOpen(!isChatOpen)}
+        isSynthesizerOpen={isSynthesizerOpen}
+        onToggleSynthesizer={() => setIsSynthesizerOpen(!isSynthesizerOpen)}
         isSandbox={isSandbox}
         onAutoLayout={handleAutoLayout}
       />
@@ -2474,11 +2487,20 @@ function App({ isSandbox = false }) {
                 onCopyConfig={handleCopyConfig}
                 onPasteConfig={handlePasteConfig}
               />
+              <SynthesizerDrawer
+                isOpen={isSynthesizerOpen}
+                onClose={() => setIsSynthesizerOpen(false)}
+                setNodes={setNodes}
+                setEdges={setEdges}
+                nodes={nodes}
+                edges={edges}
+                onLoadToNewCanvas={handleLoadToNewCanvas}
+              />
             </ErrorBoundary>
           </div>
 
           {/* 4. Results Window (Bottom Panel) */}
-          <div className="results-resizer" onMouseDown={startResizingResults} />
+          <div className="results-resizer" onMouseDown={isResultsMinimized ? undefined : startResizingResults} style={{ cursor: isResultsMinimized ? 'default' : 'ns-resize', pointerEvents: isResultsMinimized ? 'none' : 'auto' }} />
           <ErrorBoundary>
             <ResultsWindow
               selectedNode={inspectedNode}
@@ -2486,7 +2508,9 @@ function App({ isSandbox = false }) {
               results={results}
               globalLogs={globalLogs}
               activeTabId={activeTabId}
-              style={{ height: `${resultsHeight}px` }}
+              isMinimized={isResultsMinimized}
+              onToggleMinimize={() => setIsResultsMinimized(!isResultsMinimized)}
+              style={{ height: isResultsMinimized ? '35px' : `${resultsHeight}px`, minHeight: isResultsMinimized ? '35px' : '100px', overflow: 'hidden' }}
             />
           </ErrorBoundary>
         </div>
@@ -2562,14 +2586,7 @@ function App({ isSandbox = false }) {
           `}</style>
         </div>
       )}
-      
-      <ChatPanel 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
-        nodes={nodes} 
-        edges={edges} 
-      />
-      
+
     </div>
   );
 }

@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+polars
+python-dotenv
+openai>=1.30.0
+google-genai>=0.1.0
+sympy
+pydantic>=2.7.0
+pydantic-settings>=2.0.0
+xgboost
+scikit-learn
+pdfplumber
+pandas
+pytest
+pytest-asyncio
